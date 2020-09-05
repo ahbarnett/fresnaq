@@ -73,7 +73,7 @@ function test_starshadequad
 verb = 1;
 Np = 16;
 
-A = @(t) 1+0*t;    % first test disc radius r0 (no petals)
+A = @(t) 1+0*t;    % first test disc radius r0 (filled petals)
 r0 = 0.7; r1 = 1.3;
 n = 20;    % theta across each petal
 m = 30;    % radial
@@ -81,17 +81,18 @@ m = 30;    % radial
 if verb, figure(1); clf; scatter(xj,yj,10,wj); axis equal tight; colorbar; end
 fprintf('disc err: %.3g\n',sum(wj) - pi*r1^2)
 
-%eval_apod = @eval_apod_erf; Np = 16;  % analytic
-eval_apod = @eval_apod_NI2; Np = 24;  % actual
+% choose either...
+%eval_apod = @eval_apod_erf; Np = 16; ms=40:10:60; % analytic, w/ m-conv vals
+eval_apod = @eval_apod_NI2; Np = 24; ms=80:20:180;  % actual
 
 [~,r0,r1] = eval_apod(0);  % get r0,r1
 A = @(r) eval_apod(r);    % func
 %profile clear; profile on;
-[xj yj wj] = starshadequad(Np,A,r0,r1,40,200); disp(sum(wj))
+[xj yj wj] = starshadequad(Np,A,r0,r1,20,ms(1)); disp(sum(wj))
 %profile off; profile viewer;   % mostly loading file :)
 if verb, figure(2); clf; scatter(xj,yj,10,wj); axis equal tight; colorbar; end
 
-ms = 100:20:200; % check area converged ... NI2 jumps around, sucky function
-for m=ms
+for m=ms        % check area converged ...
   [xj yj wj] = starshadequad(Np,A,r0,r1,20,m); disp(sum(wj))
 end
+% NI2 case jumps around at 1e-6 level; sucky function, due to cubic interp?

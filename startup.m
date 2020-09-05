@@ -3,4 +3,6 @@
 format long g
 h = fileparts(mfilename('fullpath'));
 addpath(genpath(h))                        % gives access to all subdirs
-% don't forget to add finufft/matlab to path
+rmpath(genpath(fullfile(h,'.git')))
+rmpath([h '/devel/firstdemo']);            % since obsolete, historical only
+% user: don't forget to add finufft/matlab to path

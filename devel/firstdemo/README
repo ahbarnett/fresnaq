@@ -1,0 +1,3 @@
+First demos of the NUFFT method for aperture Frensel diffraction, 8/24/20.
+Have inconsistent definitions and name-clashes against the main package,
+hence do not add to path.
