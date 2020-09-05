@@ -10,6 +10,8 @@ function u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb)
 %
 % u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb) also reports text.
 %
+% Without any arguments, does self-test.
+%
 % Inputs:
 %  xq, yq   - quadrature nodes over aperture (real vectors length N), in meters
 %  wq       - corresponding quadrature weights (real vector length N)
@@ -45,19 +47,22 @@ function u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb)
 %  the A or plain-z-propagation prefactors, and without the "1-" from Babinet.
 %  Simply subtract from 1 to turn an aperture into an occulter.
 %
-%  The algorithm uses a 2D type 3 NUFFT.
+%  The algorithm uses a 2D type 3 NUFFT; depends on FINUFFT library.
+%
+%  Example: see test_fresnap_pts
 
 % Barnett 9/5/20
 if nargin==0, test_fresnap_pts; return; end
 if nargin<8, verb = 0; end
 
+t0=tic;
 % cq will be input strengths to NUFFT...
 cq = exp((1i*pi/lambdaz)*(xq.^2+yq.^2)) .* wq;      % premult by quadratic bit
 sc = 2*pi/lambdaz;                                  % scale factor to become FT
-u = finufft2d3(xq,yq, cq, -1, tol, sc*xi,sc*eta);   % do it
+u = finufft2d3(xq,yq, cq, -1, tol, sc*xi,sc*eta);   % do the work
 kirchfac = 1/(1i*lambdaz);                          % Kirchhoff prefactor
-u = kirchfac * (u .* exp((1i*pi/lambdaz)*(xi.^2+eta.^2))); % postmult quadratic
-if verb, fprintf('fresnap_pts done in %.3g s\n',toc(t0)), end
+u = kirchfac * (u .* exp((1i*pi/lambdaz)*(xi.^2+eta.^2)));  % postmult quadratic
+if verb, fprintf('fresnap_pts: N=%d quadr, M=%d targs, %.3g s\n',numel(xq),numel(xi),toc(t0)), end
 
 %%%%
 function test_fresnap_pts
@@ -65,9 +70,13 @@ fresnum = 10;        % Fresnel number
 lambdaz=1/fresnum;   % since we test with O(1) radius aperture
 g = @(t) 1 + 0.3*cos(3*t);   % smooth radial func on [0,2pi)
 n=350; m=120; [xq yq wq] = polarareaquad(g,n,m);   % areal quadrature
-xi = 1.5; eta = -0.5;   % target to test at
 tol = 1e-9;
-u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol);
+
+xi = 1.5; eta = -0.5;   % math test: target to test at
+u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol)
 kirchfac = 1/(1i*lambdaz);   % Kirchhoff prefactor
 ud = kirchfac * sum(exp((1i*pi/lambdaz)*((xq-xi).^2+(yq-eta).^2)) .* wq)
 fprintf('abs error vs direct Fresnel quadr at (%.3g,%.3g) = %.3g\n\n',xi,eta,abs(u-ud))
+
+M=1e6; xi = rand(M,1); eta = rand(M,1);   % speed test: bunch of targets
+u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, 1);
