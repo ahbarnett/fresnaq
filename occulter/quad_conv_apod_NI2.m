@@ -17,7 +17,7 @@ meth = 'spline'; % 'pchip'       % no different to 1e-8
 for i=1:numel(Ns)
   [xj wj] = lgwt(Ns(i),r0,r1);
   yj = interp1(x,y,xj,meth);     % interpolate off given samples to xj
-  yj = yj .* sin(100*xj);        % throw in oscillation to check
+  yj = yj .* sin(10*xj);        % throw in oscillation to check
   Is(i) = sum(yj.*wj);
 end
 disp([Ns(:), Is(:)])

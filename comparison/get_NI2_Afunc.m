@@ -4,8 +4,10 @@ function [Afunc r0 r1] = get_NI2_Afunc
 %  [Afunc r0 r1] = get_NI2_Afunc returns a function handle to A(r) valid in
 %   the apodization domain [r0,r1].
 %
-%  Note: apodization function A(r) is in notation of E. Cady Opt. Expr. 2012,
-%  starting at 1 for r<r0 and becoming 0 for r>r1.
+%  Notes:
+%  1) apodization function A(r) is in notation of E. Cady Opt. Expr. 2012,
+%     starting at 1 for r<r0 and becoming 0 for r>r1.
+%  2) now obsolete; see eval_apod_NI2.m
 
 % Barnett 9/4/20
 
