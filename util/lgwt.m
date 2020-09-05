@@ -1,17 +1,17 @@
 function [x,w]=lgwt(N,a,b)
-
-% lgwt.m
+% LGWT  Gauss-Legendre quadrature scheme on a 1D interval
 %
-% This script is for computing definite integrals using Legendre-Gauss 
-% Quadrature. Computes the Legendre-Gauss nodes and weights  on an interval
-% [a,b] with truncation order N
+% [x,w]=lgwt(N,a,b)
+%  computes the N-point Legendre-Gauss nodes x and weights w on an interval
+%  [a,b]. Both x and w are returned as column vectors.
 %
 % Suppose you have a continuous function f(x) which is defined on [a,b]
 % which you can evaluate at any x in [a,b]. Simply evaluate it at all of
 % the values contained in the x vector to obtain a vector f. Then compute
 % the definite integral using sum(f.*w);
-%
-% Written by Greg von Winckel - 02/25/2004
+
+% Written by Greg von Winckel - 02/25/2004. Docs clarify Barnett 9/4/20.
+
 N=N-1;
 N1=N+1; N2=N+2;
 

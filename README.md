@@ -9,7 +9,9 @@ fast Fourier method for computation of scalar diffraction from
 * MATLAB
 * [FINUFFT](https://github.com/flatironinstitute/finufft) preferably v2.0
 
-# usage
+# installation
 
+Install FINUFFT and compile its MATLAB interface.
+Add ``finufft/matlab`` to your MATLAB path.
 In MATLAB run ``startup`` then ``test_fresnap`` to run tests which should
 produce very small error outputs.
