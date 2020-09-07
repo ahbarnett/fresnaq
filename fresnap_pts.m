@@ -44,7 +44,8 @@ function u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb)
 %
 %  This is evaluated for each point (xi(i),eta(i)) in target list i=1,...M.
 %  This is as in (4) Cady, 2012 Opt. Expr. but without
-%  the A or plain-z-propagation prefactors, and without the "1-" from Babinet.
+%  the A or plane-z-propagation prefactors, and without the "1-" from Babinet.
+%  This makes u -> 1 in the limit of large Fresnel number.
 %  Simply subtract from 1 to turn an aperture into an occulter.
 %
 %  The algorithm uses a 2D type 3 NUFFT; depends on FINUFFT library.
@@ -57,20 +58,21 @@ if nargin<8, verb = 0; end
 
 t0=tic;
 % cq will be input strengths to NUFFT...
-cq = exp((1i*pi/lambdaz)*(xq.^2+yq.^2)) .* wq;      % premult by quadratic bit
-sc = 2*pi/lambdaz;                                  % scale factor to become FT
-u = finufft2d3(xq,yq, cq, -1, tol, sc*xi,sc*eta);   % do the work
-kirchfac = 1/(1i*lambdaz);                          % Kirchhoff prefactor
+cq = exp((1i*pi/lambdaz)*(xq.^2+yq.^2)) .* wq;       % premult by quadratic bit
+sc = 2*pi/lambdaz;                                   % scale factor to become FT
+o = []; if verb>1, o.debug = 2; end                  % FINUFFT reporting
+u = finufft2d3(xq,yq, cq, -1, tol, sc*xi,sc*eta, o); % do the work
+kirchfac = 1/(1i*lambdaz);                           % Kirchhoff prefactor
 u = kirchfac * (u .* exp((1i*pi/lambdaz)*(xi.^2+eta.^2)));  % postmult quadratic
 if verb, fprintf('fresnap_pts: N=%d quadr, M=%d targs, %.3g s\n',numel(xq),numel(xi),toc(t0)), end
 
 %%%%
 function test_fresnap_pts
-fresnum = 10;        % Fresnel number
+fresnum = 10.0;        % Fresnel number
 lambdaz=1/fresnum;   % since we test with O(1) radius aperture
 g = @(t) 1 + 0.3*cos(3*t);   % smooth radial func on [0,2pi)
 n=350; m=120; [xq yq wq] = polarareaquad(g,n,m);   % areal quadrature
-tol = 1e-9;
+tol = 1e-6;
 
 xi = 1.5; eta = -0.5;   % math test: target to test at
 u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol)
@@ -79,4 +81,5 @@ ud = kirchfac * sum(exp((1i*pi/lambdaz)*((xq-xi).^2+(yq-eta).^2)) .* wq)
 fprintf('abs error vs direct Fresnel quadr at (%.3g,%.3g) = %.3g\n\n',xi,eta,abs(u-ud))
 
 M=1e6; xi = rand(M,1); eta = rand(M,1);   % speed test: bunch of targets
-u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, 1);
+verb = 1;
+u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb);
