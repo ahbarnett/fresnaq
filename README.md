@@ -4,6 +4,11 @@
 fast Fourier method for computation of scalar Fresnel diffraction from
 0-1 (hard-edged) apertures and occulters.
 
+<p>
+<img src="pics/kite_grid.png" width="400" text="blah"/>
+</p>
+
+
 # requirements
 
 * MATLAB
