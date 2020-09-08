@@ -32,7 +32,7 @@ xlabel('\xi'); ylabel('\eta'); title('log_{10} |u|^2, occulter, grid');
 if verb>1, figure(2); clf; imagesc(xigrid,xigrid,abs(u)'.^2); % fig for repo
   colormap(hot(256)); colorbar; hold on; plot(bx,by,'w-'); axis xy equal tight;
   xlabel('\xi'); ylabel('\eta'); title('|u|^2, occulter, grid');
-  v=caxis; caxis([0 v(2)]); drawnow; print -dpng -r200 kite_grid.png
+  v=caxis; caxis([0 v(2)]); drawnow; print -dpng -r300 kite_grid.png
 end
 
 M=1e6; xi = ximax*(2*rand(M,1)-1); eta = ximax*(2*rand(M,1)-1);  % million pts
