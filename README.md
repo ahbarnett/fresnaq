@@ -4,11 +4,7 @@
 fast Fourier method for computation of scalar Fresnel diffraction from
 0-1 (hard-edged) apertures and occulters.
 
-<img align="left" src="pics/kite_grid.png" width="500">
-Example computation of diffracted intensity on a million-point grid
-to 9-digit accuracy, in 0.05 sec on a laptop.
-
-<p>
+![fresnap demo image](pics/kite_grid.png "Example computation of diffracted intensity on a million-point grid to 9-digit accuracy, in 0.05 sec on a laptop."){: width = "500px" align="center"}
 
 # requirements
 
