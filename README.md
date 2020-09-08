@@ -8,7 +8,7 @@ fast Fourier method for computation of scalar Fresnel diffraction from
 Example computation of diffracted intensity on a million-point grid
 to 9-digit accuracy, in 0.05 sec on a laptop.
 
----
+<p>
 
 # requirements
 
