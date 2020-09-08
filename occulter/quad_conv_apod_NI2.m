@@ -31,14 +31,16 @@ hold on; plot(i,i.^-3,'r-');  % seems to be 1/n^3, ie A is only C^1 (surprise!)
 
 % We also notice 250 Fourier modes (125 PTR nodes over transition region) would
 % be enough to capture A to 1e-6 absolute error. This would be a better
-% quadr scheme than G-L by factor pi/2, asymptotically.
+% quadr scheme than G-L by factor pi/2, asymptotically. Alpert, below, seems
+% to do as predicted.
 
 Ns = ceil(2.^(4:0.2:10));                 % numbers of quadr pts to test
 Is = 0*Ns;                       % values of integrals
 meth = 'spline'; % 'pchip'       % no different to 1e-8
 for i=1:numel(Ns)
-  [xj wj] = lgwt(Ns(i),r0,r1);
+  %[xj wj] = lgwt(Ns(i),r0,r1);   % pick one of the this or next two quadr's...
   %ord = 10; [xj wj] = endcorrquad(Ns(i),r0,r1,ord);  % reg grid no help for osc
+  ord = 32; [xj wj] = QuadNodesInterval(r0,r1,Ns(i),[],1,1,ord);  % Alpert grid
   yj = interp1(x,y,xj,meth);     % interpolate off given samples to xj
   yj = yj .* sin(10*xj);         % throw in oscillation to check
   Is(i) = sum(yj.*wj);
@@ -50,6 +52,7 @@ subplot(2,1,2);
 loglog(Ns(ii),abs(Is(ii)-Is(end)),'+-'); title('self-convergence of I');
 axis tight; hold on; plot(Ns, 20*Ns.^-3,'r-'); legend('err','N^{-3}');
 
+% for either Gauss-L or Alpert (latter slightly better):
 % N=300 enough for 1e-6 at freq 0, or 10, say.
 % N=400 enough for 1e-6 at freq <=100.
 

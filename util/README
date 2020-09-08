@@ -1,0 +1,6 @@
+Utilities for FRESNAP.
+
+These are mostly 1D and 2D high-order quadratures.
+
+Quad*.m are Alpert end-correction 1D routines by Andras Pataki, around 2007.
+They are tested by test_Alpert_quad.m

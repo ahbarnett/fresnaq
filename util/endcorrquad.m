@@ -1,5 +1,5 @@
 function [x w] = endcorrquad(N,a,b,k)
-% ENDCORRQUAD  Alpert low-to-medium order end-corrected rule on regular nodes
+% ENDCORRQUAD  Alpert low-to-medium order end-corrected rule, all nodes regular
 %
 % [x w] = endcorrquad(N,a,b) returns arithmetic sequence of nodes x, and weights
 %  w to match, for N-node quadrature of a smooth function on the 1D interval
@@ -8,6 +8,9 @@ function [x w] = endcorrquad(N,a,b,k)
 % [x w] = endcorrquad(N,a,b,k) uses kth-order scheme: k=2,4,6,8,10 avail.
 %
 % without arguments, does convergence test for various orders
+%
+% Note: this quadrature is not as good as Alpert's irregular auxiliary node
+%  end-correction schemes; see Quad*.m
 
 % Barnett 9/7/20; coeffs from Table 3.5 of YALEU/DCS/RR-814 by B. Alpert, 1990.
 if nargin==0, test_endcorrquad; return; end
@@ -47,14 +50,18 @@ a = 4; b = 7;
 Iex = F(b)-F(a);
 Ns = ceil(logspace(1.5,3,16));   % note exponent is 10
 figure;
-for k= [2 4 6 8 10 inf]         % last case compares to G-L, sadly much better
+ks = [2 4 6 8 10 inf];         % last case compares to G-L, sadly much better
+for k=ks
   errs = nan*Ns;
   for i=1:numel(Ns), N=Ns(i);
     if isfinite(k), [x w] = endcorrquad(N,a,b,k); else, [x w] = lgwt(N,a,b); end
     I=sum(f(x).*w);
     errs(i) = I-Iex;
   end
-  loglog(Ns,abs(errs),'+-'); hold on; plot(Ns,(3/W)*(Ns/W).^-k,'--');  % model
+  coi = get(gca,'ColorOrderIndex'); loglog(Ns,abs(errs),'+-'); hold on;
+  set(gca,'ColorOrderIndex',coi);  % reuse color
+  plot(Ns,(3/W)*(Ns/W).^-k,'--');  % model
 end
 xlabel('N'); ylabel('quadr error'); axis tight;
 title('endcorrquad: Alpert unif grid quadr err test vs Gauss');
+orders = kron(ks,[1 1]); orders = orders(1:end-1); legnum(orders);
