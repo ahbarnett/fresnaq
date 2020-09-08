@@ -15,9 +15,9 @@ function u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb)
 % Inputs:
 %  xq, yq   - quadrature nodes over aperture (real vectors length N), in meters
 %  wq       - corresponding quadrature weights (real vector length N)
-%  lambdaz  - Frensel parameter (in meters^2) = product of wavelength and
-%             downstream distance. Fresnel number is R^2/lambdaz where R is a
-%             characteristic aperture radius.
+%  lambdaz  - product of wavelength and downstream distance (in meters^2).
+%             Fresnel number is R^2/lambdaz where R is a characteristic
+%             aperture radius in meters.
 %  xi, eta  - (real vectors, length M) x,y coords of target points in detector
 %             plane.
 %  tol      - desired approximate error in u
