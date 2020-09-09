@@ -12,7 +12,7 @@ bxp = perispecdiff(bx); byp = perispecdiff(by);  % derivatives wrt t (if smooth)
 [xq yq wq] = curveareaquad(bx,by,bxp,byp,m);   % areal quadrature
 % The rest of this code is same as demo_radial.m ...
 tol = 1e-9;            % desired accuracy
-verb = 2;              % verbosity
+verb = 1;              % verbosity
 
 ximax = 1.5; ngrid = 1e3;   % million-pt grid
 [u xigrid] = fresnap_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb);
@@ -30,7 +30,8 @@ colorbar; hold on; plot(bx,by,'k-'); axis xy equal tight;
 xlabel('\xi'); ylabel('\eta'); title('log_{10} |u|^2, occulter, grid');
 
 if verb>1, figure(2); clf; imagesc(xigrid,xigrid,abs(u)'.^2); % fig for repo
-  colormap(hot(256)); colorbar; hold on; plot(bx,by,'w-'); axis xy equal tight;
+  colormap(hot(256)); colorbar; hold on; plot([bx;bx(1)],[by;by(1)],'w-');
+  axis xy equal tight;
   xlabel('\xi'); ylabel('\eta'); title('|u|^2, occulter, grid');
   v=caxis; caxis([0 v(2)]); drawnow; print -dpng -r50 kite_grid.png
 end

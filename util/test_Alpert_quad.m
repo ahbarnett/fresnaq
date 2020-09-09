@@ -1,4 +1,5 @@
 % tester for smooth end corrections of Alpert, 1999, SISC, in Quad*.m
+% Note that the number of nodes produced may be up to 4 larger than requested.
 % Also see endcorrquad.m
 % Barnett 9/8/20.
 

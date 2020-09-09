@@ -25,8 +25,10 @@ function [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb)
 if nargin==0, test_starshadequad; return; end
 if nargin<7, verb = 0; end
 
-if r0>=r1, error('r0 must be < r1'); end
-[z w] = lgwt(m,0,1);
+if r0>r1, error('r0 must be <= r1'); end
+%[z w] = lgwt(m,0,1);                    % radial petal quadrature, descending z
+% or use Alpert, which may produce a couple more nodes than requested...
+[z w] = QuadNodesInterval(0,1,m,[],1,1,32); m=numel(z); z=z(end:-1:1); w=w(end:-1:1);  % flip to descending order
 
 % central disc...
 N = ceil(0.3*n*Np);   % PTR in theta, rough guess so dx about same
@@ -83,16 +85,16 @@ fprintf('disc err: %.3g\n',sum(wj) - pi*r1^2)
 
 % choose either...
 %eval_apod = @eval_apod_erf; Np = 16; ms=40:10:60; % analytic, w/ m-conv vals
-eval_apod = @eval_apod_NI2; Np = 24; ms=80:20:180;  % actual
+eval_apod = @eval_apod_NI2; Np = 24; ms=60:20:180;  % actual
 
 [~,r0,r1] = eval_apod(0);  % get r0,r1
 A = @(r) eval_apod(r);    % func
 %profile clear; profile on;
-[xj yj wj] = starshadequad(Np,A,r0,r1,20,ms(1)); disp(sum(wj))
+[xj yj wj] = starshadequad(Np,A,r0,r1,20,ms(1)); %disp(sum(wj))
 %profile off; profile viewer;   % mostly loading file :)
 if verb, figure(2); clf; scatter(xj,yj,10,wj); axis equal tight; colorbar; end
 
 for m=ms        % check area converged ...
   [xj yj wj] = starshadequad(Np,A,r0,r1,20,m); disp(sum(wj))
 end
-% NI2 case jumps around at 1e-6 level; sucky function, due to cubic interp?
+% NI2 case jumps around at 1e-6 rel level; sucky function, due to only C^1.

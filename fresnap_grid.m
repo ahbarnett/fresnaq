@@ -51,8 +51,12 @@ function [u xigrid] = fresnap_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb)
 %  the A or plane-z-propagation prefactors, and without the "1-" from Babinet.
 %  Simply subtract from 1 to turn an aperture into an occulter.
 %
-%  The grid values in each dim are: ximax*(2*(0:ngrid-1)/ngrid - 1)
-%  The grid is thus nearly centered on the origin (half a grid-point off).
+%  The grid values in each dim are:
+%      ximax*(2*(0:ngrid-1)/ngrid - 1)         if ngrid is even,
+%      ximax*(2*(0.5:ngrid-0.5)/ngrid - 1)     if ngrid is odd.
+%  The grid is thus centered on the origin, or half a grid-point off in the
+%  even case.  (This arises from the "modeord" of FINUFFT, and could easily
+%  be changed by phasing.)
 %  Output values go in increasing xi fast then increasing eta slow (major axis),
 %  ie [xi, eta] = ndgrid(g,g) where g is the above list of 1D grid values.
 %
@@ -63,6 +67,7 @@ function [u xigrid] = fresnap_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb)
 %
 %  Also see: fresnap_pts
 
+
 % Barnett 9/7/20
 if nargin==0, test_fresnap_grid; return; end
 if nargin<8, verb = 0; end
@@ -70,6 +75,7 @@ if nargin<8, verb = 0; end
 t0=tic;
 xigrid = ximax*(2*(0:ngrid-1)/ngrid - 1);            % for user edification
 dxi = 2*ximax/ngrid;                                 % target grid spacing
+if mod(ngrid,2), xigrid = xigrid + dxi/2; end        % hangle the odd case
 sc = 2*pi/lambdaz;                                   % scale factor to become FT
 dk = sc*dxi;                                         % scaled grid spacing
 maxNU = max(abs(dk*[xq(:);yq(:)]));                  % max NU coord

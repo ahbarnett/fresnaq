@@ -3,7 +3,8 @@ function [x,w]=lgwt(N,a,b)
 %
 % [x,w]=lgwt(N,a,b)
 %  computes the N-point Legendre-Gauss nodes x and weights w on an interval
-%  [a,b]. Both x and w are returned as column vectors.
+%  [a,b]. Both x and w are returned as column vectors, in descending order
+%  of x.
 %
 % Suppose you have a continuous function f(x) which is defined on [a,b]
 % which you can evaluate at any x in [a,b]. Simply evaluate it at all of

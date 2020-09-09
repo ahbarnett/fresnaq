@@ -1,7 +1,7 @@
 % Test convergence of quadrature on interpolated apodization profile from NI2.
 % This makes sure we can interpolate from the NI2 A(r) samples on regular
 % grid and use our high-order quadrature on it, at least in 1D.
-% We also warm up with exploring the underlying smoothness of A: is only C^1.
+% We also warm up with exploring underlying smoothness of A: it's only C^1 !
 % Barnett 9/4/20
 
 clear

@@ -7,7 +7,10 @@ function [Ax, Aw] = QuadNodesInterval(a, b, N, h, corra, corrb, order)
 %        2: square root singularity
 %        3: log singularity
 % order: is the order of the endpoint corrections used
-% The nodes (Ax) and the weights (Aw) are returned
+% The nodes (Ax) and the weights (Aw) are returned.
+% Note that the number of nodes returned need not be N; it may be a few more.
+
+% Andras Pataki, circa 2007.
 
     if (corra == 0)
 	NodesToSkipL = 0;
