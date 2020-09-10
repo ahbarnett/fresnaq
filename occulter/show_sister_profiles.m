@@ -18,9 +18,11 @@ for i=1:nfs
   ypp = [0;diff(y,2);0];          % discrete 2nd deriv assuming unif samples
   plot(x, [y, 0.5*ypp/max(ypp)],'.','markersize',10); xlabel('r (m)');
   vline([r0 r1]);
-  title(sprintf('%s : Np=%d',fs{i},o.numPetals))
+  title(sprintf('%s: Np=%d, 1-A(%.3g)=%.3g, A(%.3g)=%.3g',fs{i},o.numPetals,r0,1-y(1),r1,y(end)))
   axis tight; legend('raw Profile samples', 'scaled discr 2nd deriv');
   % optionally overlay the interpolated func...
   %A = @(r) eval_sister_apod(file,r);
   %r = linspace(r0,r1,1e4); hold on; plot(r,A(r),'r-');
 end
+
+%print -dpng all_sister_profiles.png
