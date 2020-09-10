@@ -5,7 +5,7 @@ clear; verb = 1;  % verbosity
 tol = 1e-9;       % desired accuracy
 lambdaz = 9.0;    % wavelength*dist, in m^2, recall Fres # = Reff^2/(lambda.z)
 
-design = 'erf';   % choose design from below list...
+design = 'NW2';   % choose design from below list...
 switch design 
  case 'disc'
   Np = 1; r0=5; r1=10; Afunc = @(r) 1+0*r; % 10m radius disc: Poisson spot u=1!
@@ -23,7 +23,7 @@ switch design
   beta = 3.0;                       % good for A or 1-A to decay to 1e-5
   Afunc = @(r) erfc(beta*(2*r-(r0+r1))/(r1-r0))/2;
   %e=1e-3; Afunc = @(r) e + (1-e)*Afunc(r); % fatten the tips: get u(0,0)~e
-  e=1e-2; Afunc = @(r) e*(r1-r)/(r1-r0) + (1-e)*Afunc(r);  % sharp linear tips
+  %e=1e-2; Afunc = @(r) e*(r1-r)/(r1-r0) + (1-e)*Afunc(r);  % sharp linear tips
   %e=1e-3; Afunc = @(r) (1-e)*Afunc(r); % fatten the gaps: get u(0,0)~e
   n = 30; m = 100;       % good to lambdaz>=9; convergence must be tested
  case 'NI2'                         % actual NI2 starshade, cubic interpolated
@@ -36,7 +36,7 @@ switch design
   %Afunc = @(r) 1 - (1-Afunc(r)).*((r>=6) + (r<6).*cos(pi/2*(6-r)).^2);  % "
   n = 40; m = 400;    % use quad_conv_apod_NI2 converged m (to 1e-6), lz>=5
  case 'NW2'                         % actual NI2 starshade, cubic interpolated
-  file = '/home/alex/physics/starshade/SISTER/input_scenes/locus/in/NW2';
+  file = '/home/alex/physics/starshade/SISTER/input_scenes/locus/in/TV3';
   Np = 24;                          % petals told cut off harshly at r1 ...bad
   [~,r0,r1] = eval_sister_apod(file,0);   % get apodization range [r0,r1]
   Afunc = @(r) eval_sister_apod(file,r);  % func handle (reads file when called)
@@ -44,10 +44,9 @@ switch design
   %Afunc = @(r) Afunc(r).*((r<=12) + (r>12).*cos(pi/2*(r-12)).^2); % C^1 blend
   %Afunc = @(r) 1 - (1-Afunc(r)).*((r>=6) + (r<6).*cos(pi/2*(6-r)).^2);  % "
   n = 50; m = 700;    % use quad_conv_apod_NI2 converged m (to 1e-6), lz>=5
-  lambdaz = 20;       % bigger since Reff~27 bigger.
+  lambdaz = 10;       % bigger since Reff~27 bigger.
 end
-fprintf('apod: 1-A(%.5g)=%.3g, A(%.5g)=%.3g\n',r0,1-Afunc(r0),r1,Afunc(r1))
-
+fprintf('apod ends: 1-A(%.5g)=%.3g, A(%.5g)=%.3g\n',r0,1-Afunc(r0),r1,Afunc(r1))
 
 [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb);   % fill areal quadr
 
@@ -65,7 +64,7 @@ ximax = 15.0; ngrid = 1e3;     % ngrid^2 centered target grid out to +-ximax
 it = 1; jt = 1;  % grid indices to test, eg (1,1) is SW corner of grid
 ut = u(it,jt); xi = xigrid(it); eta = xigrid(jt);     % math check u
 fprintf('u(%.3g,%.3g) = %.12g + %.12gi\n',xi,eta,real(ut),imag(ut))
-%return                     % useful for convergence testing
+%return                     % useful for convergence testing the above u
 
 figure(3); clf;
 u = 1-u;               % convert aperture to occulter
@@ -73,6 +72,12 @@ imagesc(xigrid,xigrid,log10(abs(u)'.^2));  % note transpose: x is fast, y slow.
 colorbar; caxis([-11 0.2]); hold on; axis xy equal tight;
 plot([bx;bx(1)], [by;by(1)], 'k+-','markersize',1);
 xlabel('\xi'); ylabel('\eta'); title('log_{10} |u|^2, occulter, grid');
-if strcmp(design,'NI2'), show_bdry_occulter('NI2'); end    % check geom good
+if strcmp(design,'NI2') || strcmp(design,'NW2')
+  show_occulter_locus(file); end    % check geom good
+
+% check on-axis case and compare to tip/gap fractional Poisson spot prediction:
 it = ceil(ngrid/2+1); jt = it;      % indices of center xi=eta=0
-fprintf('intensity at (0,0) is %.3g\n',abs(u(it,jt)).^2)
+fprintf('|u|^2 intensity at (0,0) is %.3g\n',abs(u(it,jt)).^2)
+ugap = (1-Afunc(r0))*exp((1i*pi/lambdaz)*r0^2);   % simple fraction-of-Pois-spot
+utip = Afunc(r1)*exp((1i*pi/lambdaz)*r1^2);
+fprintf('tip/gap scatt prediction is %.3g\n',abs(ugap+utip).^2)  % add in phase?

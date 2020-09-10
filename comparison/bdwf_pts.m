@@ -1,11 +1,11 @@
-% BDWF  Cady's line integral method scalar Fresnel diffraction of 0-1 occulter
+% BDWF_PTS  Cady's method scalar Fresnel diffraction, arb targets, multi-lambda
 %
-% E = bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
+% E = bdwf_pts(xVals, yVals, zVals, Z, lambda, xi, eta, psi1, psi2)
 %
 %  implements Cady's 2012 method for scalar Fresnel diffraction from an occulter
 %  defined by a set of boundary quadrature points.  The acronym BDWF is
 %  "boundary diffraction wave fast".  It evaluates U in eqn (4) in Cady's paper,
-%  with A=1, on a square grid of targets (eta,xi), but the notation is
+%  with A=1, on list of arbitrary targets (eta,xi), but the notation is
 %  apparently different, since an arbitrary incident wave spherical direction,
 %  not included in (4), is also allowed.
 %
@@ -17,18 +17,14 @@
 %                  in meters.
 %   zVals - z coords (along viewing axis), in meters. If empty, 0 is used.
 %   Z - downstream propagation distance, in meters
-%   lambda - set of wavelengths (vector length nLambda), in meters
-%   dxO - target grid spacing in both eta and xi directions, in meters
-%   nO - target grid size in both directions
+%   lambda - wavelength, in meters, or list of nLambda such wavelengths
+%   xi, eta - target points (x,y coordinates in meters), each can be a list of
+%             nTarg such coordinates.
 %   psi1 - off-axis angle of source wave (relative to z axis), radians
 %   psi2 - polar angle of source wave (measured around the z axis), radians
-%   deltaX, deltaY - target grid translation in eta, xi, in meters.
 %
 % Outputs:
-%   E   -  nO*nO*nLambda 3D array of complex amplitudes at the square
-%          detector grid, for each target (eta, xi), and wavelength lambda.
-%          This grid in the (eta,xi) detector plane is the product of the
-%          1D grids:  eta = deltaX + ((1:nO)-0.5)* ....
+%   E   -  list of complex wave amplitudes at the targets (size nTarg * nLambda)
 %
 % Note:
 %   1) translation of the occulter (xVals,yVals) by (-eta0,-nu0) is
@@ -42,10 +38,11 @@
 %   only ever appear as a product, ie could be combined to a single parameter.
 %
 % For testing, see test_bdwf.m
-%
-% Documentation by Alex H. Barnett, 9/2/20, since none found.
 
-% Below code and header have not been altered by AHB:
+% Docs & refactored to remove grid creation from bdwf, Alex H. Barnett 9/10/20.
+% Mostly this involved replacing double jj,kk loops and indexing by single j.
+% Otherwise mostly left in its found state; timing text output removed.
+% Now follows the original header:
 
 
 
@@ -75,32 +72,8 @@
 % Version #4: takes edges in directly, can do off-axis and out-of-plane,
 % can do lateral errors, can do multiple wavelengths at once, very fast if
 % you're not overlapping the geometric outline of the occulter.
-%
-% Note: Still assumes an underlying grid.
 
-function E = bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
-
-% ahb debug:
-%disp('in bdwf. whos:')
-%whos
-figure; plot(xVals,yVals,'.'); axis equal tight; title('input to bdwf'); drawnow;
-%Z
-%deltaX,deltaY
-%dxO
-%lambda
-%nO
-%psi1
-%psi2
-
-
-% Set up output grid
-Nx = nO;
-Ny = nO;
-
-width = nO*dxO;
-xO = -width/2+dxO/2:dxO:width/2-dxO/2;
-yO = xO - deltaY;
-xO = xO - deltaX;
+function E = bdwf_pts(xVals, yVals, zVals, Z, lambda, xi, eta, psi1, psi2)
 
 % Prep flags
 if isempty(zVals) || isequal(zVals, zeros(size(zVals)))
@@ -129,9 +102,10 @@ outPoly = [xVals(:), yVals(:)]; %polyclip(xVals, yVals, min(xO)-dxO/2, max(xO)+d
 p2l = 2*pi./lambda;
 pil = pi./lambda;
 pilz = pi./(lambda*Z);
-nLambda = length(lambda);
-E = zeros(Nx, Ny, nLambda);
-wind = zeros(Nx, Ny);
+nTarg = numel(xi);
+nLambda = numel(lambda);
+E = zeros(nTarg,nLambda);
+wind = zeros(nTarg);
 vt = outPoly;
 
 s1 = sin(psi1);
@@ -155,13 +129,11 @@ if flagZ
     
     if flagP1
         % Off-axis source present, as well as out-of-plane errors
-        tilt = zeros(nO, nO);
+        tilt = zeros(nTarg);
         
-        for jj = 1:Nx
-            for kk = 1:Ny
-                
-                dx = (xm - xO(jj));
-                dy = (ym - yO(kk));
+        for j = 1:nTarg             % AHB made single loop for clarity
+                dx = (xm - xi(j));
+                dy = (ym - eta(j));
                 dz = (zm - Z);
                 
                 f = -s1*dz + c1*c2*dx + c1*s2*dy;
@@ -171,40 +143,37 @@ if flagZ
                 fSquarePlusGSquare = f.*f + g.*g;
                 sHatCrossPDotLdl = xl.*(f*s2 + g*c1*c2) + yl.*(-f*c2 + g*c1*s2) + zl.*(-g*s1);
                 
-                for qq = 1:nLambda
-                    E(jj, kk, qq) = sum(exp(1i*pil(qq)*(fSquarePlusGSquare./h))./(fSquarePlusGSquare).*sHatCrossPDotLdl);
-                end
+            for qq=1:nLambda
+                E(j,qq) = sum(exp(1i*pil(qq)*(fSquarePlusGSquare./h))./(fSquarePlusGSquare).*sHatCrossPDotLdl);
                 
-                wind(jj, kk) = polywindFlag(vt, [(xO(jj) - Z*s1*c2) (yO(kk) - Z*s1*s2)], inOccFlag);
-                tilt(jj, kk) = xO(jj)*c2 + yO(kk)*s2;
+                wind(j) = polywindFlag(vt, [(xi(j) - Z*s1*c2) (eta(j) - Z*s1*s2)], inOccFlag);
+                tilt(j) = xi(j)*c2 + eta(j)*s2;
             end
         end
         
         for qq = 1:nLambda
             eikz = exp(1i*p2l(qq)*Z*c1)*exp(1i*p2l(qq)*s1*tilt);
-            E(:,:,qq) = eikz./(2*pi).*E(:,:,qq);
-            E(:,:,qq) = eikz.*(wind == 0) - E(:,:,qq);
+            E(:,qq) = eikz./(2*pi).*E(:,qq);
+            E(:,qq) = eikz.*(wind == 0) - E(:,qq);
         end
     else
         % Out-of-plane but on-axis
-        for jj = 1:Nx
-            for kk = 1:Ny
+        for j = 1:nTarg            % AHB ditto
                 h = (Z - zm);
                 
-                fSquarePlusGSquare = (xm - xO(jj)).^2 + (ym - yO(kk)).^2;
-                sHatCrossPDotLdl = xl.*(ym - yO(kk)) - yl.*(xm - xO(jj));
+                fSquarePlusGSquare = (xm - xi(j)).^2 + (ym - eta(j)).^2;
+                sHatCrossPDotLdl = xl.*(ym - eta(j)) - yl.*(xm - xi(j));
                 for qq = 1:nLambda
-                    E(jj, kk, qq) = sum(exp(1i*pil(qq)*(fSquarePlusGSquare./h))./(fSquarePlusGSquare).*sHatCrossPDotLdl);
+                    E(j, qq) = sum(exp(1i*pil(qq)*(fSquarePlusGSquare./h))./(fSquarePlusGSquare).*sHatCrossPDotLdl);
                 end
                 
-                wind(jj, kk) = polywindFlag(vt, [xO(jj) yO(kk)], inOccFlag);
-            end
+                wind(j) = polywindFlag(vt, [xi(j) eta(j)], inOccFlag);
         end
         
         for qq = 1:nLambda
             eikz = exp(1i*p2l(qq)*Z);
-            E(:,:,qq) = eikz./(2*pi).*E(:,:,qq);
-            E(:,:,qq) = eikz.*(wind == 0) - E(:,:,qq);
+            E(:,qq) = eikz./(2*pi).*E(:,qq);
+            E(:,qq) = eikz.*(wind == 0) - E(:,qq);
         end
     end
     
@@ -220,14 +189,13 @@ tic
 %sprintf( 'Nx, Ny=%i,%i changed to %i,%i', Nx_0, Ny_0, Nx, Ny )
 
         % Off-axis source present but in-plane
-        tilt = zeros(nO, nO);
+        tilt = zeros(nTarg);
         
-        for jj = 1:Nx
+        for j = 1:nTarg
         % SRH: some timing when the computation is long
         t_jj = tic ;
-            for kk = 1:Ny
-                dx = (xm - xO(jj));
-                dy = (ym - yO(kk));
+                dx = (xm - xi(j));
+                dy = (ym - eta(j));
 % 6% running time for f, g and h                
                 f = s1*Z + c1*c2*dx + c1*s2*dy;
                 g =      -    s2*dx +    c2*dy;
@@ -244,30 +212,20 @@ tic
 %                     E(jj, kk, qq) = sum(exp(1i*pil(qq)*(fSquarePlusGSquare./h))./(fSquarePlusGSquare).*sHatCrossPDotLdl);
 % SRH
 % 32% of the running time spent here
-                    E(jj, kk, qq) = sum(exp(1i*pil(qq)*tmp_1).*tmp_2) ; 
+                    E(j, qq) = sum(exp(1i*pil(qq)*tmp_1).*tmp_2) ; 
                 end
 % 48% running time spent here                
-                wind(jj, kk) = polywindFlag(vt, [(xO(jj) - Z*s1*c2) (yO(kk) - Z*s1*s2)], inOccFlag);
+                wind(j) = polywindFlag(vt, [(xi(j) - Z*s1*c2) (eta(j) - Z*s1*s2)], inOccFlag);
 % Negligible time spent here
-                tilt(jj, kk) = xO(jj)*c2 + yO(kk)*s2;
-            end
-        % SRH: print out a message if it is going to be a long calculation
-        t_jj = toc( t_jj ) ;
-          if ( t_jj > 120 / Nx ) && ( jj == 1 )
-          clck = clock ;
-          tm_s_nw = clck( 4 ) * 3600 + clck( 5 ) * 60 + clck( 6 ) ;
-          tm_s_end = tm_s_nw + t_jj * Nx ;
-          hr_end = floor( tm_s_end / 3600 ) ;
-          min_end = ceil( ( tm_s_end - 3600 * hr_end ) / 60 ) ;
-          disp( sprintf( 'The single, multi-wavelength, PSF construction should finish at %02i:%02i', hr_end, min_end ) )
-          end
+                tilt(j) = xi(j)*c2 + eta(j)*s2;
+            % (AHB killed timing output since grid-dependent)
         end
-toc        
+%toc        
 %  Negligible time spent here
         for qq = 1:nLambda
             eikz = exp(1i*p2l(qq)*Z*c1)*exp(1i*p2l(qq)*s1*tilt);
-            E(:,:,qq) = eikz./(2*pi).*E(:,:,qq);
-            E(:,:,qq) = eikz.*(wind == 0) - E(:,:,qq);
+            E(:,qq) = eikz./(2*pi).*E(:,qq);
+            E(:,qq) = eikz.*(wind == 0) - E(:,qq);
         end
     else
         % On-axis source & flat occulter
@@ -278,12 +236,11 @@ tic
 %Nx = 4 ; 
 %Ny = 4 ;
 %sprintf( 'Nx, Ny=%i,%i changed to %i,%i', Nx_0, Ny_0, Nx, Ny ) 
-        for jj = 1:Nx
+        for j = 1:nTarg
         % SRH: some timing when the computation is long
         t_jj = tic ;
-            for kk = 1:Ny
-                fSquarePlusGSquare = (xm - xO(jj)).^2 + (ym - yO(kk)).^2;
-                sHatCrossPDotLdl = xl.*(ym - yO(kk)) - yl.*(xm - xO(jj));
+                fSquarePlusGSquare = (xm - xi(j)).^2 + (ym - eta(j)).^2;
+                sHatCrossPDotLdl = xl.*(ym - eta(j)) - yl.*(xm - xi(j));
 % SRH
                 tmp = sHatCrossPDotLdl ./ fSquarePlusGSquare ;                
 %if ( jj == 1 ) && ( kk == 1 )
@@ -293,31 +250,21 @@ tic
 %end
                 for qq = 1:nLambda
 % SRH
-                    E(jj,kk,qq) = sum(exp(1i*fSquarePlusGSquare*pilz(qq)).*tmp);
+                    E(j,qq) = sum(exp(1i*fSquarePlusGSquare*pilz(qq)).*tmp);
 %                    E(jj,kk,qq) = sum(exp(1i*pilz(qq)*(fSquarePlusGSquare))./(fSquarePlusGSquare).*sHatCrossPDotLdl);
 %                    D(jj,kk,qq) = E2(jj,kk,qq) - E(jj,kk,qq) ;
                 end
                 
-                wind(jj, kk) = polywindFlag(vt, [xO(jj) yO(kk)], inOccFlag);
-            end
-        % SRH: print out a message if it is going to be a long calculation
-        t_jj = toc( t_jj ) ;
-          if ( t_jj > 120 / Nx ) && ( jj == 1 )
-          clck = clock ;
-          tm_s_nw = clck( 4 ) * 3600 + clck( 5 ) * 60 + clck( 6 ) ;
-          tm_s_end = tm_s_nw + t_jj * Nx ;
-          hr_end = floor( tm_s_end / 3600 ) ;
-          min_end = floor( ( tm_s_end - 3600 * hr_end ) / 60 ) ;
-          disp( sprintf( 'The single, multi-wavelength, PSF construction should finish at %02i:%02i', hr_end, min_end ) )
-          end
+                wind(j) = polywindFlag(vt, [xi(j) eta(j)], inOccFlag);
+        % (AHB killed timing output since grid-dependent)
         end
-toc
+%toc
 %make_a_stop
         
         for qq = 1:nLambda
             eikz = exp(1i*p2l(qq)*Z);
-            E(:,:,qq) = eikz./(2*pi).*E(:,:,qq);
-            E(:,:,qq) = eikz.*(wind == 0) - E(:,:,qq);
+            E(:,qq) = eikz./(2*pi).*E(:,qq);
+            E(:,qq) = eikz.*(wind == 0) - E(:,qq);
 %if ( qq == 1 )
 %disp( sprintf( 'E(1,1,1)=%3.6e', E( 1, 1, qq ) ) )
 %end

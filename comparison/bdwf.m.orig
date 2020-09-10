@@ -1,54 +1,3 @@
-% BDWF  Cady's line integral method scalar Fresnel diffraction of 0-1 occulter
-%
-% E = bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
-%
-%  implements Cady's 2012 method for scalar Fresnel diffraction from an occulter
-%  defined by a set of boundary quadrature points.  The acronym BDWF is
-%  "boundary diffraction wave fast".  It evaluates U in eqn (4) in Cady's paper,
-%  with A=1, on a square grid of targets (eta,xi), but the notation is
-%  apparently different, since an arbitrary incident wave spherical direction,
-%  not included in (4), is also allowed.
-%
-%  Reference: Cady, E. "Boundary diffraction wave integrals for diffraction
-%   modeling of external occulters", Opt. Expr. 20(14) 15196--15208 (2012).
-%
-% Inputs:
-%   xVals, yVals - vectors of ordered boundary point x,y (in-plane) coords,
-%                  in meters.
-%   zVals - z coords (along viewing axis), in meters. If empty, 0 is used.
-%   Z - downstream propagation distance, in meters
-%   lambda - set of wavelengths (vector length nLambda), in meters
-%   dxO - target grid spacing in both eta and xi directions, in meters
-%   nO - target grid size in both directions
-%   psi1 - off-axis angle of source wave (relative to z axis), radians
-%   psi2 - polar angle of source wave (measured around the z axis), radians
-%   deltaX, deltaY - target grid translation in eta, xi, in meters.
-%
-% Outputs:
-%   E   -  nO*nO*nLambda 3D array of complex amplitudes at the square
-%          detector grid, for each target (eta, xi), and wavelength lambda.
-%          This grid in the (eta,xi) detector plane is the product of the
-%          1D grids:  eta = deltaX + ((1:nO)-0.5)* ....
-%
-% Note:
-%   1) translation of the occulter (xVals,yVals) by (-eta0,-nu0) is
-%   equivalent to translation of the detector grid's (deltaX,deltaY) by
-%   (eta0,nu0), which is also equivalent, up to accuracy O(psi1^2), to changing
-%   the incident direction from on-axis (psi1=0) to:
-%      psi1 = sqrt(eta0^2+nu0^2) / Z
-%      psi2 = atan2(eta0,nu0)               *** CHECK THE SIGNS.
-%
-%   2) for psi1=0 (on-axis, ie, flagP1=false internally), lambda and Z can
-%   only ever appear as a product, ie could be combined to a single parameter.
-%
-% For testing, see test_bdwf.m
-%
-% Documentation by Alex H. Barnett, 9/2/20, since none found.
-
-% Below code and header have not been altered by AHB:
-
-
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % SISTER: Starshade Imaging Simulation Toolkit for Exoplanet Reconnaissance
 %
@@ -79,19 +28,6 @@
 % Note: Still assumes an underlying grid.
 
 function E = bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
-
-% ahb debug:
-%disp('in bdwf. whos:')
-%whos
-figure; plot(xVals,yVals,'.'); axis equal tight; title('input to bdwf'); drawnow;
-%Z
-%deltaX,deltaY
-%dxO
-%lambda
-%nO
-%psi1
-%psi2
-
 
 % Set up output grid
 Nx = nO;
