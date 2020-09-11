@@ -35,12 +35,12 @@
 %   E   -  nO*nO*nLambda 3D array of complex amplitudes at the square
 %          detector grid, for each target (eta, xi), and wavelength lambda.
 %          This grid in the (eta,xi) detector plane is the product of the
-%          1D grids:  xi = deltaX + ((-nO+1)/2 : (nO-1)/2) * dxO and
-%                    eta = deltaY + ((-nO+1)/2 : (nO-1)/2) * dxO
+%          1D grids:  xi = -deltaX + ((-nO+1)/2 : (nO-1)/2) * dxO and
+%                    eta = -deltaY + ((-nO+1)/2 : (nO-1)/2) * dxO
 %
 % Note:
 %   Translation of the occulter (xVals,yVals) by (xi0,eta0) is
-%   equivalent to translation of the detector grid's (deltaX,deltaY) by
+%   equivalent to translation (-deltaX,-deltaY) of the detector grid by
 %   (-xi0,-eta0), which is also equivalent, up to accuracy O(psi1^2), to
 %   changing the incident direction from on-axis (psi1=0) to:
 %      psi1 = sqrt(xi0^2+eta0^2) / Z
