@@ -2,7 +2,6 @@
 % Barnett 9/8/20
 clear; verb = 1;  % verbosity
 
-tol = 1e-9;       % desired accuracy
 lambdaz = 9.0;    % wavelength*dist, in m^2, recall Fres # = Reff^2/(lambda.z)
 
 design = 'NW2';   % choose design from below list...
@@ -60,11 +59,12 @@ if verb>1, figure(1); clf; scatter(xq,yq,10,wq); axis equal tight; colorbar;
 end
 
 ximax = 15.0; ngrid = 1e3;     % ngrid^2 centered target grid out to +-ximax
+tol = 1e-9;                    % desired accuracy
 [u xigrid] = fresnap_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb);
 it = 1; jt = 1;  % grid indices to test, eg (1,1) is SW corner of grid
 ut = u(it,jt); xi = xigrid(it); eta = xigrid(jt);     % math check u
 fprintf('u(%.3g,%.3g) = %.12g + %.12gi\n',xi,eta,real(ut),imag(ut))
-%return                     % useful for convergence testing the above u
+%return                        % useful for convergence testing the above u
 
 figure(3); clf;
 u = 1-u;               % convert aperture to occulter
@@ -80,4 +80,4 @@ it = ceil(ngrid/2+1); jt = it;      % indices of center xi=eta=0
 fprintf('|u|^2 intensity at (0,0) is %.3g\n',abs(u(it,jt)).^2)
 ugap = (1-Afunc(r0))*exp((1i*pi/lambdaz)*r0^2);   % simple fraction-of-Pois-spot
 utip = Afunc(r1)*exp((1i*pi/lambdaz)*r1^2);
-fprintf('tip/gap scatt prediction is %.3g\n',abs(ugap+utip).^2)  % add in phase?
+fprintf('tip/gap scatt prediction is %.3g\n',abs(ugap+utip).^2)   % phased add?

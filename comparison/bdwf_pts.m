@@ -9,6 +9,13 @@
 %  apparently different, since an arbitrary incident wave spherical direction,
 %  not included in (4), is also allowed.
 %
+%  In the case psi1=0 (on-axis), it thus evaluates
+%
+%      u(xi,eta) = exp(2.pi.z/lambda) [  1 - (i.lambdaz)^{-1} int_Omega
+%                      exp { i.pi.lambdaz [(x-xi)^2+(y-eta)^2] }  dxdy  ]
+%
+%  This is evaluated for each point (xi,eta) in the target list.
+%
 %  Reference: Cady, E. "Boundary diffraction wave integrals for diffraction
 %   modeling of external occulters", Opt. Expr. 20(14) 15196--15208 (2012).
 %
@@ -27,15 +34,12 @@
 %   E   -  list of complex wave amplitudes at the targets (size nTarg * nLambda)
 %
 % Note:
-%   1) translation of the occulter (xVals,yVals) by (xi0,eta0) is
+%   Translation of the occulter (xVals,yVals) by (xi0,eta0) is
 %   equivalent to translation of all targets by (-xi0,-eta0), which is
 %   also equivalent, up to accuracy O(psi1^2), to changing the incident
 %   direction from on-axis (psi1=0) to:
 %      psi1 = sqrt(xi0^2+eta0^2) / Z
 %      psi2 = atan2(eta0,xi0)
-%
-%   2) for psi1=0 (on-axis, ie, flagP1=false internally), lambda and Z can
-%   only ever appear as a product, ie could be combined to a single parameter.
 %
 % For testing, see test_bdwf.m
 

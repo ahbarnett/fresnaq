@@ -19,8 +19,9 @@ ud = 1-ud              % Babinet the aperture into an occulter
 
 % now we try BDWF with the same n bdry pts...
 psi1=0; psi2=0;     % on-axis incident wave, and no Z variation
-lambda = 1e-5;      % typ wavelength rel to size, makes Z huge, non-convergent!
+lambda = 1.1e-5;      % generic, typ wavelength rel to size, makes Z big
 Z = lambdaz/lambda;
+ud = ud * exp(2i*pi*Z/lambda);       % ud didn't yet include plane z-propagation
 ub = bdwf_pts(bx,by, [], Z, lambda, xi, eta, psi1, psi2)
 fprintf('bdwf (n=%d) err vs direct Fresnel quadr: %.3g\n',n,abs(ub-ud))
 
@@ -59,11 +60,20 @@ t0 = toc(t0);
 tol = 1e-9;
 u = fresnap_pts(xq, yq, wq, lambdaz, xi(:), eta(:), tol);    % col vec of targs
 u = 1-u;
+u = u * exp(2i*pi*Z/lambda);       % we didn't yet include plane z-propagation
 fprintf('bdwf (n=%d) grid max err vs fresnap_pts: %.3g\n',n,norm(ub(:)-u,inf))
 % is consistent w/ bdwf_pts error, fine.
 figure; plot(xi,eta,'k.'); hold on; plot([bx bx(1)], [by by(1)], '-');
 axis equal tight; title('test\_bdwf grid targets');
 
+% report speed results...
 fprintf('bdwf one lambda (n=%d, nTargs=%d) in %.3g s = %.3g targ-bdry pairs/s\n',n,nO^2,t0,nO^2*n/t0)
-% bdwf speed = 3e7 pairs/sec on laptop.
+% bdwf speed = 3e7 pairs/sec on laptop (uses all 8 threads)
 
+% multi wavelength speed test...
+Nl = 10; lambda = lambda*linspace(1,2,Nl);
+t0 = tic;
+ub = bdwf(bx,by,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);
+t0 = toc(t0);
+fprintf('bdwf %d lambdas (n=%d, nTargs=%d) in %.3g s = %.3g targ-bdry pairs/s\n',Nl,n,nO^2,t0,Nl*nO^2*n/t0)
+% bdwf speed = 7e7 pairs/sec on laptop; ie multi-lambda is 2x faster.

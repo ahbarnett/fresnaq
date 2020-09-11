@@ -8,6 +8,13 @@
 %  with A=1, on a square grid of targets (eta,xi), but the notation is
 %  apparently different, since an arbitrary incident wave spherical direction,
 %  not included in (4), is also allowed.
+%  In the case psi1=0 (on-axis), it thus evaluates
+%
+%      u(xi,eta) = exp(2.pi.z/lambda) [  1 - (i.lambdaz)^{-1} int_Omega
+%                      exp { i.pi.lambdaz [(x-xi)^2+(y-eta)^2] }  dxdy  ]
+%
+%  This is evaluated for each point (xi,eta) in target grid described
+%  below.
 %
 %  Reference: Cady, E. "Boundary diffraction wave integrals for diffraction
 %   modeling of external occulters", Opt. Expr. 20(14) 15196--15208 (2012).
@@ -32,15 +39,12 @@
 %                    eta = deltaY + ((-nO+1)/2 : (nO-1)/2) * dxO
 %
 % Note:
-%   1) translation of the occulter (xVals,yVals) by (xi0,eta0) is
+%   Translation of the occulter (xVals,yVals) by (xi0,eta0) is
 %   equivalent to translation of the detector grid's (deltaX,deltaY) by
 %   (-xi0,-eta0), which is also equivalent, up to accuracy O(psi1^2), to
 %   changing the incident direction from on-axis (psi1=0) to:
 %      psi1 = sqrt(xi0^2+eta0^2) / Z
 %      psi2 = atan2(eta0,xi0)
-%
-%   2) for psi1=0 (on-axis, ie, flagP1=false internally), lambda and Z can
-%   only ever appear as a product, ie could be combined to a single parameter.
 %
 % For testing, see test_bdwf.m
 %
@@ -81,10 +85,10 @@
 
 function E = bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
 
-% AHB debug: the only way to figure what's being sent into this code...
+% AHB debug: was the only way to figure what's being sent into this code...
 %disp('in bdwf. whos:')
 %whos
-%figure; plot(xVals,yVals,'.'); axis equal tight; title('input to bdwf'); drawnow;
+%figure; plot(xVals,yVals,'.'); axis equal tight; title('input locus to bdwf'); drawnow;
 %Z
 %deltaX,deltaY
 %dxO
@@ -92,7 +96,6 @@ function E = bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, d
 %nO
 %psi1
 %psi2
-
 
 % Set up output grid
 Nx = nO;
