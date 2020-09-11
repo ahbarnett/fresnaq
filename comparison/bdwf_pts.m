@@ -27,12 +27,12 @@
 %   E   -  list of complex wave amplitudes at the targets (size nTarg * nLambda)
 %
 % Note:
-%   1) translation of the occulter (xVals,yVals) by (-eta0,-nu0) is
-%   equivalent to translation of the detector grid's (deltaX,deltaY) by
-%   (eta0,nu0), which is also equivalent, up to accuracy O(psi1^2), to changing
-%   the incident direction from on-axis (psi1=0) to:
-%      psi1 = sqrt(eta0^2+nu0^2) / Z
-%      psi2 = atan2(eta0,nu0)               *** CHECK THE SIGNS.
+%   1) translation of the occulter (xVals,yVals) by (xi0,eta0) is
+%   equivalent to translation of all targets by (-xi0,-eta0), which is
+%   also equivalent, up to accuracy O(psi1^2), to changing the incident
+%   direction from on-axis (psi1=0) to:
+%      psi1 = sqrt(xi0^2+eta0^2) / Z
+%      psi2 = atan2(eta0,xi0)
 %
 %   2) for psi1=0 (on-axis, ie, flagP1=false internally), lambda and Z can
 %   only ever appear as a product, ie could be combined to a single parameter.

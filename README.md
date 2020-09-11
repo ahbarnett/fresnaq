@@ -28,7 +28,7 @@ The main library functions we provide are:
 * ``fresnap_grid.m`` : compute diffracted amplitude on regular square centered grid
 * ``fresnap_pts.m`` : compute diffracted amplitude at arbitrary target points
 
-Both routines can be tested by calling them with no arguments.
+Both routines are documented and can be tested by calling them with no arguments.
 
 # demos
 

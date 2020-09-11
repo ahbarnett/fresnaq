@@ -1,0 +1,6 @@
+Here we have comparisons of fresnap against other codes for a similar purpose.
+Speficically:
+
+* bdwf.m of E. Cady, Opt Expr 2012, except we document it plus provide a version
+with more general interface (target points not restricted to a grid).
+

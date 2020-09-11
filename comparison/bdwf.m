@@ -28,15 +28,16 @@
 %   E   -  nO*nO*nLambda 3D array of complex amplitudes at the square
 %          detector grid, for each target (eta, xi), and wavelength lambda.
 %          This grid in the (eta,xi) detector plane is the product of the
-%          1D grids:  eta = deltaX + ((1:nO)-0.5)* ....
+%          1D grids:  xi = deltaX + ((-nO+1)/2 : (nO-1)/2) * dxO and
+%                    eta = deltaY + ((-nO+1)/2 : (nO-1)/2) * dxO
 %
 % Note:
-%   1) translation of the occulter (xVals,yVals) by (-eta0,-nu0) is
+%   1) translation of the occulter (xVals,yVals) by (xi0,eta0) is
 %   equivalent to translation of the detector grid's (deltaX,deltaY) by
-%   (eta0,nu0), which is also equivalent, up to accuracy O(psi1^2), to changing
-%   the incident direction from on-axis (psi1=0) to:
-%      psi1 = sqrt(eta0^2+nu0^2) / Z
-%      psi2 = atan2(eta0,nu0)               *** CHECK THE SIGNS.
+%   (-xi0,-eta0), which is also equivalent, up to accuracy O(psi1^2), to
+%   changing the incident direction from on-axis (psi1=0) to:
+%      psi1 = sqrt(xi0^2+eta0^2) / Z
+%      psi2 = atan2(eta0,xi0)
 %
 %   2) for psi1=0 (on-axis, ie, flagP1=false internally), lambda and Z can
 %   only ever appear as a product, ie could be combined to a single parameter.
@@ -45,7 +46,7 @@
 %
 % Documentation by Alex H. Barnett, 9/2/20, since none found.
 
-% Below code and header have not been altered by AHB:
+% Below code and header have not been altered by AHB, apart from debug comments:
 
 
 
@@ -80,10 +81,10 @@
 
 function E = bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
 
-% ahb debug:
+% AHB debug: the only way to figure what's being sent into this code...
 %disp('in bdwf. whos:')
 %whos
-figure; plot(xVals,yVals,'.'); axis equal tight; title('input to bdwf'); drawnow;
+%figure; plot(xVals,yVals,'.'); axis equal tight; title('input to bdwf'); drawnow;
 %Z
 %deltaX,deltaY
 %dxO
