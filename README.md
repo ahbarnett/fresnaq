@@ -37,3 +37,8 @@ how to call the library.
 The above example is produced by setting ``verb=2`` in ``demo_paramcurve.m``.
 Since areal quadratures are key, there are various
 quadrature helper routines in ``util`` used in the tests and demos.
+
+# comparisons with boundary line integral methods
+
+See ``bdrymeths`` directory.
+

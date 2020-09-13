@@ -9,7 +9,7 @@ lambdaz=1/fresnum;     % wavelength times dist, recall Fres # = R^2/(lambda.z)
 n = 600; m = 100;      % depend on Fresnel number; convergence must be tested
 t = 2*pi*(0:n-1)/n; bx = x(t); by = y(t);      % bdry points
 bxp = perispecdiff(bx); byp = perispecdiff(by);  % derivatives wrt t (if smooth)
-[xq yq wq] = curveareaquad(bx,by,bxp,byp,m);   % areal quadrature
+[xq yq wq] = curveareaquad(bx,by,(2*pi/n)*bxp,(2*pi/n)*byp,m);   % areal quadr
 % The rest of this code is same as demo_radial.m ...
 tol = 1e-9;            % desired accuracy
 verb = 1;              % verbosity

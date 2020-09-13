@@ -1,0 +1,11 @@
+Here we collect Fresnel diffraction methods based on boundary line integrals,
+and include some comparsions between them and the main fresnap areal method.
+
+Specifically:
+
+* bdwf.m of E. Cady, Opt Expr 2012, except we document it plus provide a version
+with more general interface (target points not restricted to a grid).
+ (bdwf.m.orig contains the original code pulled from SISTER pkg, 9/2/20.)
+
+* our own much simpler and more accurate nsli (non-singular line intergral)
+version.

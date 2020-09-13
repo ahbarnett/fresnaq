@@ -13,15 +13,15 @@ xi = 1.5; eta = -0.5;   % math test: generic target to test at
 
 kirchfac = 1/(1i*lambdaz);   % Kirchhoff prefactor, direct Fresnel integral...
 bxp = perispecdiff(bx); byp = perispecdiff(by);  % derivatives wrt t (if smooth)
-[xq yq wq] = curveareaquad(bx,by,bxp,byp,m);   % areal quadrature
+[xq yq wq] = curveareaquad(bx,by,(2*pi/n)*bxp,(2*pi/n)*byp,m);   % areal quadr
 ud = kirchfac * sum(exp((1i*pi/lambdaz)*((xq-xi).^2+(yq-eta).^2)) .* wq);
-ud = 1-ud              % Babinet the aperture into an occulter
+ud = 1-ud;             % Babinet the aperture into an occulter
 
 % now we try BDWF with the same n bdry pts...
 psi1=0; psi2=0;     % on-axis incident wave, and no Z variation
 lambda = 1.1e-5;      % generic, typ wavelength rel to size, makes Z big
 Z = lambdaz/lambda;
-ud = ud * exp(2i*pi*Z/lambda);       % ud didn't yet include plane z-propagation
+ud = ud * exp(2i*pi*Z/lambda)       % ud didn't yet include plane z-propagation
 ub = bdwf_pts(bx,by, [], Z, lambda, xi, eta, psi1, psi2)
 fprintf('bdwf (n=%d) err vs direct Fresnel quadr: %.3g\n',n,abs(ub-ud))
 

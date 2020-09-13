@@ -45,7 +45,7 @@
 
 % Docs & refactored to remove grid creation from bdwf, Alex H. Barnett 9/10/20.
 % Mostly this involved replacing double jj,kk loops and indexing by single j.
-% Otherwise mostly left in its found state; timing text output removed.
+% Otherwise mostly left in its found state, except timing text output removed.
 % Now follows the original header:
 
 

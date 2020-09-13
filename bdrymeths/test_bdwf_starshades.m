@@ -27,7 +27,7 @@ switch design
   %e=1e-3; Afunc = @(r) (1-e)*Afunc(r); % fatten the gaps: get u(0,0)~e
   n = 30; m = 100;       % good to lambdaz>=9; convergence must be tested
  case 'NI2'                         % actual NI2 starshade, cubic interpolated
-  cwd = fileparts(mfilename('fullpath')); file = [cwd '/occulter/NI2'];
+  cwd = fileparts(mfilename('fullpath')); file = [cwd '/../occulter/NI2'];
   Np = 24;                          % petals told cut off harshly at r1 ...bad
   [~,r0,r1] = eval_sister_apod(file,0);   % get apodization range [r0,r1]
   Afunc = @(r) eval_sister_apod(file,r);  % func handle (reads file when called)
@@ -44,7 +44,6 @@ switch design
   %Afunc = @(r) Afunc(r).*((r<=12) + (r>12).*cos(pi/2*(r-12)).^2); % C^1 blend
   %Afunc = @(r) 1 - (1-Afunc(r)).*((r>=6) + (r<6).*cos(pi/2*(6-r)).^2);  % "
   n = 50; m = 700;    % use quad_conv_apod_NI2 converged m (to 1e-6), lz>=5
-  lambdaz = 10;       % bigger since Reff~27 bigger.
 end
 fprintf('apod ends: 1-A(%.5g)=%.3g, A(%.5g)=%.3g\n',r0,1-Afunc(r0),r1,Afunc(r1))
 Reff = (r0+r1)/2;
@@ -76,8 +75,12 @@ if strcmp(design,'NI2'), o=load(file);
   fprintf('max |ub| error on grid : %.3g\n',norm(abs(ub(:)) - abs(u(:)),inf))
   % note because of overall phase garbage, have to compare magnitudes.
   figure; subplot(1,3,1); imagesc(xigrid,xigrid,abs(u)'); colorbar
-  title('u fresnap');
-  subplot(1,3,2); imagesc(xigrid,xigrid,abs(ub)'); colorbar; title('u bdwf')
-  subplot(1,3,3); imagesc(xigrid,xigrid,abs(abs(u)-abs(ub))'); colorbar
-  title('difference in |u|');
+  title('u fresnap, resampled locus');
+  subplot(1,3,2); imagesc(xigrid,xigrid,abs(abs(u)-abs(ub))'); colorbar
+  title('abs diff |u|: fresnap vs bdwf (raw locus)');
+  [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,2,4000,verb);   % fill areal quadr
+  ubr = bdwf(bx,by,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);  % 1e-4, bad
+  subplot(1,3,3); imagesc(xigrid,xigrid,abs(abs(u)-abs(ubr))'); colorbar
+  title('abs diff |u|: fresnap vs bdwf (resamp locus)');
 end
+figure; plot(bx,by,'.-'); axis equal; overlay_zones(lambda*Z,0,0,'r-');
