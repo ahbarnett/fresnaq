@@ -75,12 +75,29 @@ if strcmp(design,'NI2'), o=load(file);
   fprintf('max |ub| error on grid : %.3g\n',norm(abs(ub(:)) - abs(u(:)),inf))
   % note because of overall phase garbage, have to compare magnitudes.
   figure; subplot(1,3,1); imagesc(xigrid,xigrid,abs(u)'); colorbar
-  title('u fresnap, resampled locus');
+  title('u fresnap (areal from resampled locus)');
   subplot(1,3,2); imagesc(xigrid,xigrid,abs(abs(u)-abs(ub))'); colorbar
   title('abs diff |u|: fresnap vs bdwf (raw locus)');
   [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,2,4000,verb);   % fill areal quadr
   ubr = bdwf(bx,by,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);  % 1e-4, bad
   subplot(1,3,3); imagesc(xigrid,xigrid,abs(abs(u)-abs(ubr))'); colorbar
   title('abs diff |u|: fresnap vs bdwf (resamp locus)');
+
+  % seems nicely resolved...
+  %figure; plot(bx,by,'.-'); axis equal; overlay_zones(lambda*Z,0,0,'r-');
+
+  % compare nsli answer (w/ psi1=0) using raw or resamp locus samples...
+  xi = xx(:); eta = yy(:);
+  [wx wy] = crudecurvequad(o.xVals,o.yVals);
+  un = nsli_pts(o.xVals,o.yVals,wx,wy, lambda*Z, xi, eta);
+  un = 1-un;     % turn aperture into occulter
+  un = reshape(un,[ngrid ngrid]);
+  figure; subplot(1,2,1); imagesc(xigrid,xigrid,abs(abs(u)-abs(un))'); colorbar
+  title('abs diff |u|: fresnap vs nsli (raw locus)');
+  [wx wy] = crudecurvequad(bx,by);
+  unr = nsli_pts(bx,by,wx,wy, lambda*Z, xi, eta);   % resampled bdry
+  unr = 1-unr;     % turn aperture into occulter
+  unr = reshape(unr,[ngrid ngrid]);
+  subplot(1,2,2); imagesc(xigrid,xigrid,abs(abs(u)-abs(unr))'); colorbar
+  title('abs diff |u|: fresnap vs nsli (resamp locus)');
 end
-figure; plot(bx,by,'.-'); axis equal; overlay_zones(lambda*Z,0,0,'r-');
