@@ -38,7 +38,11 @@ The above example is produced by setting ``verb=2`` in ``demo_paramcurve.m``.
 Since areal quadratures are key, there are various
 quadrature helper routines in ``util`` used in the tests and demos.
 
-# comparisons with boundary line integral methods
+# alternative boundary line integral methods
 
-See ``bdrymeths`` directory.
+See ``bdrymeths`` directory for BDWF and the non-singular line integral method
+for the Fresnel approximation.
+Note that term "boundary integral" refers to a aperture boundary line integral methods, and should not be confused with 
+3D integral-equation based wave scattering method (which would go beyond
+the Fresnel approximation, and are significantly harder).
 
