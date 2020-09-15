@@ -266,7 +266,7 @@ tic
           disp( sprintf( 'The single, multi-wavelength, PSF construction should finish at %02i:%02i', hr_end, min_end ) )
           end
         end
-toc        
+%toc        
 %  Negligible time spent here
         for qq = 1:nLambda
             eikz = exp(1i*p2l(qq)*Z*c1)*exp(1i*p2l(qq)*s1*tilt);
@@ -315,7 +315,7 @@ tic
           disp( sprintf( 'The single, multi-wavelength, PSF construction should finish at %02i:%02i', hr_end, min_end ) )
           end
         end
-toc
+%toc
 %make_a_stop
         
         for qq = 1:nLambda

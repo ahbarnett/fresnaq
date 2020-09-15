@@ -28,7 +28,7 @@ fprintf('bdwf (n=%d) err vs direct Fresnel quadr: %.3g\n',n,abs(ub-ud))
 % convergence study of bdwf wrt n...
 ns = 100*2.^(1:9);
 errs = 0*ns;
-disp('                      n         err')
+disp('                      n         err of bdwf vs truth')
 for i=1:numel(ns), n=ns(i);
   t = 2*pi*(0:n-1)/n; bx = x(t); by = y(t);      % bdry points
   ub = bdwf_pts(bx,by, [], Z, lambda, xi, eta, psi1, psi2);
@@ -36,9 +36,10 @@ for i=1:numel(ns), n=ns(i);
   disp([n errs(i)])
 end
 figure; loglog(ns, errs, '+-'); axis tight; title('bdwf convergence to true');
-xlabel('n (bdry nodes)'); ylabel('bdwf(n) error');
+xlabel('n (bdry nodes)');
 hold on; plot(ns,1.0./ns,'r-');   % appears to be only 1st-order (!) in h~1/n
-% also: if lambda<=1e6 then Z>=5e4, and does not converge! (round-off error?)
+legend('bdwf(n) err vs true', '1st order');
+% also: if lambda<=1e6 then Z>=5e4, and does not converge due to ill-defined phase
 
 % check translational invariance...
 ub2 = bdwf_pts(bx-xi, by-eta, [], Z, lambda, 0,0, psi1, psi2);

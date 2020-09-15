@@ -1,5 +1,7 @@
 % test BDWF with generic targets on starshades as in ../demo_starshades.m
+% Compares results to fresnap, and NSLI.
 % Barnett 9/10/20
+clear all; verb = 1;
 
 lambda = 4.27e-7;      % generic wavelength, blue (meters)
 Z = 2.5e7;             % downstream distance (meters) ... good for Reff~10m
@@ -60,7 +62,7 @@ u = u * exp(2i*pi*Z/lambda);   % plane z-propagation (since fresnap doesn't),
 
 it = ceil(ngrid/2+1); jt = it;      % indices of center xi=eta=0
 ut = u(it,jt); xi = xigrid(it); eta = xigrid(jt);     % math check u
-fprintf('|u|^2 intensity at (%.3g,%.3g) is %.3g\n',xi,eta,abs(u(it,jt)).^2)
+fprintf('|u|^2 intensity at (%.3g,%.3g) is %.6g\n',xi,eta,abs(u(it,jt)).^2)
 
 nO = ngrid; dxO = 2*ximax/nO;  % convert our grid to bdwf grid params...
 deltaX = 0; if mod(ngrid,2)==0, deltaX = +dxO/2; end   % deltaX is backwards!
@@ -68,36 +70,52 @@ deltaY = deltaX;
 [xx yy] = make_grid_bdwf(dxO, nO, deltaX, deltaY);     % ugh
 fprintf('grid match: %.3g\n',norm(xx(:,1)-xigrid(:)))
 
-% compare bdwf's answer (w/ psi1=0) using raw locus samples
+% compare to bdwf's and nsli's answer (w/ psi1=0) using raw & resampled locus:
 if strcmp(design,'NI2'), o=load(file);
+  tic
   ub = bdwf(o.xVals,o.yVals,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);
-  fprintf('|ub|^2 intensity at (0,0) is %.3g\n',abs(ub(it,jt)).^2)
+  toc
+  fprintf('|ub|^2 intensity at (0,0) is %.6g\n',abs(ub(it,jt)).^2)
   fprintf('max |ub| error on grid : %.3g\n',norm(abs(ub(:)) - abs(u(:)),inf))
   % note because of overall phase garbage, have to compare magnitudes.
-  figure; subplot(1,3,1); imagesc(xigrid,xigrid,abs(u)'); colorbar
-  title('u fresnap (areal from resampled locus)');
-  subplot(1,3,2); imagesc(xigrid,xigrid,abs(abs(u)-abs(ub))'); colorbar
-  title('abs diff |u|: fresnap vs bdwf (raw locus)');
-  [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,2,4000,verb);   % fill areal quadr
+  figure; subplot(2,3,1); imagesc(xigrid,xigrid,abs(u)'); colorbar
+  title('u fresnap (areal from resampled locus)'); axis xy equal tight
+  subplot(2,3,2); imagesc(xigrid,xigrid,abs(abs(u)-abs(ub))'); colorbar
+  title('abs diff |u|: fresnap vs bdwf (raw locus)'); axis xy equal tight
+  % even though m=400 enough for areal quadr to 1e-6, get 1e-4 BDWF, 3e4 NSLI
+  % even m=1000 gets 7e-5 BDWF, 5e-5 NSLI. m=3000 needed to get sim to raw locus
+  m = 2000;    % recall original was sampled at only 2462 pts in [5,13]
+  dummyn=2; [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,dummyn,m,verb,'u');
+  tic
   ubr = bdwf(bx,by,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);  % 1e-4, bad
-  subplot(1,3,3); imagesc(xigrid,xigrid,abs(abs(u)-abs(ubr))'); colorbar
-  title('abs diff |u|: fresnap vs bdwf (resamp locus)');
+  toc
+  subplot(2,3,3); imagesc(xigrid,xigrid,abs(abs(u)-abs(ubr))'); colorbar
+  title('abs diff |u|: fresnap vs bdwf (resamp locus)'); axis xy equal tight
 
-  % seems nicely resolved...
-  %figure; plot(bx,by,'.-'); axis equal; overlay_zones(lambda*Z,0,0,'r-');
-
+  % locus resampling seems nicely resolved rel to fresnel zones...
+  subplot(2,3,4); plot(bx,by,'.'); axis equal; overlay_zones(lambda*Z,0,0,'r-');
+  title(sprintf('bdry nodes (locus) from resamp A(r): m=%d',m));
+  
   % compare nsli answer (w/ psi1=0) using raw or resamp locus samples...
   xi = xx(:); eta = yy(:);
-  [wx wy] = crudecurvequad(o.xVals,o.yVals);
+  [wx wy] = crudecurvequad(o.xVals,o.yVals);          % weights for raw locus
+  tic
   un = nsli_pts(o.xVals,o.yVals,wx,wy, lambda*Z, xi, eta);
+  toc
   un = 1-un;     % turn aperture into occulter
   un = reshape(un,[ngrid ngrid]);
-  figure; subplot(1,2,1); imagesc(xigrid,xigrid,abs(abs(u)-abs(un))'); colorbar
-  title('abs diff |u|: fresnap vs nsli (raw locus)');
+  fprintf('|un|^2 intensity at (0,0) is %.6g\n',abs(un(it,jt)).^2)
+  subplot(2,3,5); imagesc(xigrid,xigrid,abs(abs(u)-abs(un))'); colorbar
+  title('abs diff |u|: fresnap vs nsli (raw locus)'); axis xy equal tight
   [wx wy] = crudecurvequad(bx,by);
-  unr = nsli_pts(bx,by,wx,wy, lambda*Z, xi, eta);   % resampled bdry
+  tic;
+  unr = nsli_pts(bx,by,wx,wy, lambda*Z, xi, eta);      % resampled bdry
+  toc
   unr = 1-unr;     % turn aperture into occulter
   unr = reshape(unr,[ngrid ngrid]);
-  subplot(1,2,2); imagesc(xigrid,xigrid,abs(abs(u)-abs(unr))'); colorbar
-  title('abs diff |u|: fresnap vs nsli (resamp locus)');
+  fprintf('|unr|^2 intensity at (0,0) is %.6g\n',abs(unr(it,jt)).^2)
+  subplot(2,3,6); imagesc(xigrid,xigrid,abs(abs(u)-abs(unr))'); colorbar
+  title('abs diff |u|: fresnap vs nsli (resamp locus)'); axis xy equal tight
+  % looks like NSLI is faster than BDWF. resampling affects (low-order) acc of
+  % both, as expect, but BDWF suffers more with resampling.
 end

@@ -1,16 +1,17 @@
 function [wx wy] = crudecurvequad(bx, by)
-% CRUDECURVEQUAD  trapezoid weights for vector closed line integral given nodes
+% CRUDECURVEQUAD  trapezoid weights for vector closed line integral, given nodes
 %
 % [wx wy] = crudecurvequad(bx, by) given coordinates of nodes defining a
 %  curve in the plane, which need not correspond to any smooth
-%  parameterization, return simple trapezoid rule weights. Ie such that,
+%  parameterization, return simple composite trapezoid rule weights. Ie, such
+%  that,
+%             sum_{i=1}^n F(bx(i),by(i)) dot (wx(i),wy(i))  \approx
+%                   int_dOmega F(x,y) dot d(x,y)
 %
-%    sum_{i=1}^n F(bx(i),by(i)) dot (wx(i),wy(i))  \approx
-%        int_dOmega F(x,y) dot d(x,y)
+%  for all smooth (in R2 -> R2) functions F. The trap. rule corresponds to
+%  linear interpolation of the integrand between nodes, of course.
 %
-%  for smooth (in R2 -> R2) functions F.
-%
-%  With no arguments, does self test.
+%  With no arguments, does self test, showing 2nd order (1/n^2) accuracy.
 
 % Barnett 9/13/20
 if nargin==0, test_crudecurvequad; return; end

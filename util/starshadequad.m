@@ -1,7 +1,7 @@
-function [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb)
+function [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb,Aquad)
 % STARSHADEQUAD  quadrature for area integral over apodized petal 0-1 occulter.
 %
-% [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m)
+% [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb)
 %
 %  Uses Theta(r) formula of (1)-(2) in Cady '12 to build area quadrature scheme
 %  over starshade, given apodization function and other geometric parameters.
@@ -12,23 +12,34 @@ function [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb)
 %  r0,r1 = apodization domain of radii (note differs from Cash'11 defn a,b)
 %   radial apodization is 1 for r<r0, A((r-r0)/(r1-r0)) for r0<r<r1, 0 for r>r1.
 %  n = nodes per petal width
-%  m = nodes over disc and over radial apodization [r0,r1]
+%  m = nodes over disc and over radial apodization [r0,r1]. (exact may vary)
+%  verb = (optional) 0,1, etc, verbosity.
+%  Aquad = (optional) apodization quadrature type: 'a' Alpert (default),
+%          'g' Gauss, 'u' Uniform grid (including end points).
 %
 % Outputs:
-% xj,yj - nodes.
-% wj - weights
-% bx,by - boundary nodes just for plotting purposes
+% xj,yj - (areal) nodes
+% wj    - corresp (areal) weights
+% bx,by - boundary nodes (those lying along profile, not petal tips or gaps)
 %
 % Design is perfectly symmetric; no perturbations for now.
 
 % Barnett 8/24/20; changed to Afunc(r), swapped r0,r1, 9/5/20.
 if nargin==0, test_starshadequad; return; end
 if nargin<7, verb = 0; end
+if nargin<8, Aquad = 'a'; end
 
 if r0>r1, error('r0 must be <= r1'); end
-%[z w] = lgwt(m,0,1);                    % radial petal quadrature, descending z
-% or use Alpert, which may produce a couple more nodes than requested...
-[z w] = QuadNodesInterval(0,1,m,[],1,1,32); m=numel(z); z=z(end:-1:1); w=w(end:-1:1);  % flip to descending order
+switch Aquad          % set up a [0,1] quadr scheme
+ case 'g'
+  [z w] = lgwt(m,0,1);                  % radial petal quadrature, descending z
+ case 'a' % or use Alpert, which may make couple more nodes than requested...
+  [z w] = QuadNodesInterval(0,1,m,[],1,1,32); m=numel(z); z=z(end:-1:1); w=w(end:-1:1);  % flip to descending order
+ case 'u'   % uniform grid, including endpoints, composite trap rule...
+  z = linspace(0,1,m); h=z(2)-z(1); z=z(end:-1:1)'; w=h*[.5;ones(m-2,1);.5];
+ otherwise
+  error('unknown Aquad!')
+end
 
 % central disc...
 N = ceil(0.3*n*Np);   % PTR in theta, rough guess so dx about same
@@ -57,7 +68,7 @@ for i=1:m
   wj = [wj; ww];                                     % their weights
 end
 if verb
-  fprintf('petals: %d nodes (%d angular, %d radial)\n',Np*n*m,Np*n,m)
+  fprintf('petals (Aquad=%s): %d nodes (%d angular, %d radial)\n',Aquad,Np*n*m,Np*n,m)
   fprintf('tot nodes: %d\n',numel(wj))
 end
 

@@ -55,7 +55,7 @@ function u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta)
 % Barnett 9/13/20
 if nargin==0, test_nsli_pts; return; end
 
-u = complex(nan*xi);                    % alloc complex outputs
+u = complex(nan*xi);                    % alloc complex outputs, shape of xi
 for i=1:numel(xi)
   dx = bx - xi(i); dy = by - eta(i);    % displacements of nodes from ith targ
   r2 = dx.*dx + dy.*dy;
