@@ -18,13 +18,14 @@ function u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb)
 %  lambdaz  - product of wavelength and downstream distance (in meters^2).
 %             Fresnel number is R^2/lambdaz where R is a characteristic
 %             aperture radius in meters.
-%  xi, eta  - (real vectors, length M) x,y coords of target points in detector
-%             plane.
+%  xi, eta  - (real vectors or arrays, M elements) x,y coords of target points
+%             in detector plane.
 %  tol      - desired approximate error in u
 %  verb     - verbosity (0,1,..)
 %
 % Outputs:
 %  u        - complex scalar diffracted amplitude at each target point
+%             (same shape as xi)
 %
 % Notes:
 %  The input quadrature scheme should integrate smooth 2D functions f, with
@@ -61,9 +62,10 @@ t0=tic;
 cq = exp((1i*pi/lambdaz)*(xq.^2+yq.^2)) .* wq;       % premult by quadratic bit
 sc = 2*pi/lambdaz;                                   % scale factor to become FT
 o = []; if verb>1, o.debug = 2; end                  % FINUFFT reporting
-u = finufft2d3(xq,yq, cq, -1, tol, sc*xi,sc*eta, o); % do the work
+u = finufft2d3(xq,yq, cq, -1, tol, sc*xi(:),sc*eta(:), o);  % do the work
 kirchfac = 1/(1i*lambdaz);                           % Kirchhoff prefactor
-u = kirchfac * (u .* exp((1i*pi/lambdaz)*(xi.^2+eta.^2)));  % postmult quadratic
+u = kirchfac * (u .* exp((1i*pi/lambdaz)*(xi(:).^2+eta(:).^2)));  % postmult bit
+u = reshape(u,size(xi));
 if verb, fprintf('fresnap_pts: N=%d quadr, M=%d targs, %.3g s\n',numel(xq),numel(xi),toc(t0)), end
 
 %%%%

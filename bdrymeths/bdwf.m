@@ -3,7 +3,7 @@
 % E = bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
 %
 %  implements Cady's 2012 method for scalar Fresnel diffraction from an occulter
-%  defined by a set of boundary quadrature points.  The acronym BDWF is
+%  defined by a set of boundary quadrature points (locus).  The acronym BDWF is
 %  "boundary diffraction wave fast".  It evaluates U in eqn (4) in Cady's paper,
 %  with A=1, on a square grid of targets (eta,xi), but the notation is
 %  apparently different, since an arbitrary incident wave spherical direction,
@@ -14,7 +14,8 @@
 %                      exp { i.pi.lambdaz [(x-xi)^2+(y-eta)^2] }  dxdy  ]
 %
 %  This is evaluated for each point (xi,eta) in target grid described
-%  below.
+%  below. The convergence (based on test_bdwf below) appears to be 1st order,
+%  ie O(1/n), w.r.t. n the number of nodes, even for a smooth boundary.
 %
 %  Reference: Cady, E. "Boundary diffraction wave integrals for diffraction
 %   modeling of external occulters", Opt. Expr. 20(14) 15196--15208 (2012).
@@ -38,7 +39,7 @@
 %          1D grids:  xi = -deltaX + ((-nO+1)/2 : (nO-1)/2) * dxO and
 %                    eta = -deltaY + ((-nO+1)/2 : (nO-1)/2) * dxO
 %
-% Note:
+% Notes:
 %   Translation of the occulter (xVals,yVals) by (xi0,eta0) is
 %   equivalent to translation (-deltaX,-deltaY) of the detector grid by
 %   (-xi0,-eta0), which is also equivalent, up to accuracy O(psi1^2), to
@@ -47,6 +48,8 @@
 %      psi2 = atan2(eta0,xi0)
 %
 % For testing, see test_bdwf.m
+%
+% See also: bdry_pts, nsli_pts, make_grid_bdwf.
 %
 % Documentation by Alex H. Barnett, 9/2/20, since none found.
 

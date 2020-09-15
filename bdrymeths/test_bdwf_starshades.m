@@ -84,7 +84,7 @@ if strcmp(design,'NI2'), o=load(file);
   title('abs diff |u|: fresnap vs bdwf (raw locus)'); axis xy equal tight
   % even though m=400 enough for areal quadr to 1e-6, get 1e-4 BDWF, 3e4 NSLI
   % even m=1000 gets 7e-5 BDWF, 5e-5 NSLI. m=3000 needed to get sim to raw locus
-  m = 2000;    % recall original was sampled at only 2462 pts in [5,13]
+  m = 2000;    % recall original was sampled at only 2462 pts in r=[5,13]
   dummyn=2; [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,dummyn,m,verb,'u');
   tic
   ubr = bdwf(bx,by,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);  % 1e-4, bad
