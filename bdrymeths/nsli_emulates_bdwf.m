@@ -1,7 +1,7 @@
-function E = nsli_replaces_bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
-% NSLI_REPLACES_BDWF  drop-in replacement for BDWF using NSLI & inc dir transl
+function E = nsli_emulates_bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2, deltaX, deltaY)
+% NSLI_EMULATES_BDWF  drop-in replacement for BDWF using NSLI & inc dir transl
 %
-% E = nsli_replaces_bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2,
+% E = nsli_emulates_bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, psi2,
 %  deltaX, deltaY) sets up target grid, loops over lambda, and calls NSLI for
 %  each Fresnel scalar diffraction. It uses 2nd-order accurate locus quadrature,
 %  thus does not achieve the potential (high-order) accuracy of NSLI.
@@ -16,7 +16,7 @@ function E = nsli_replaces_bdwf(xVals, yVals, zVals, Z, lambda, dxO, nO, psi1, p
 % Also see: NSLI 
 
 % Barnett 9/14/20
-if nargin==0, test_nsli_replaces_bdwf; return; end
+if nargin==0, test_nsli_emulates_bdwf; return; end
 
 if ~isempty(zVals) || sum(zVals~=0.0), warning('zVals~=0 not implemented!'), end
 [xi,eta] = make_grid_bdwf(dxO, nO, deltaX, deltaY);    % make target grid
@@ -31,7 +31,7 @@ for l=1:Nl
 end
 
 %%%%%%%%%%
-function test_nsli_replaces_bdwf          % some code from test_bdwf
+function test_nsli_emulates_bdwf          % some code from test_bdwf
 x = @(t) 0.5*cos(t)+0.5*cos(2*t); y = @(t) sin(t);   % smooth kite shape, Reff~1
 lambda = linspace(4e-7,5e-7,10);          % some wavelengths (meters)
 Z = 2.5e5;                  % downstream distance (meters) ... good for Reff~1m
@@ -46,7 +46,7 @@ for n=ns
   t = 2*pi*(0:n-1)/n; bx = x(t); by = y(t);      % make bdry points
   % compare the two methods...
   tic; Eb = bdwf(bx,by,[], Z, lambda, dxO, nO, psi1,psi2, deltaX,deltaY); %toc
-  tic; En = nsli_replaces_bdwf(bx,by,[], Z, lambda, dxO, nO, psi1,psi2, deltaX,deltaY); %toc
+  tic; En = nsli_emulates_bdwf(bx,by,[], Z, lambda, dxO, nO, psi1,psi2, deltaX,deltaY); %toc
   fprintf('n=%d\t max E diff:  %.3g (ampl only) \t (%.3g including phase)\n', n, max(abs(abs(Eb(:))-abs(En(:)))), max(abs(Eb(:)-En(:))))
 end
 
