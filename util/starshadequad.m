@@ -94,18 +94,33 @@ m = 30;    % radial
 if verb, figure(1); clf; scatter(xj,yj,10,wj); axis equal tight; colorbar; end
 fprintf('disc err: %.3g\n',sum(wj) - pi*r1^2)
 
-% choose either...
-%eval_apod = @eval_apod_erf; Np = 16; ms=40:10:60; % analytic, w/ m-conv vals
-eval_apod = @eval_apod_NI2; Np = 24; ms=60:20:180;  % actual
+designs = {'erf','NI2'};
+for d=1:numel(designs)
+  switch designs{d}
+   case 'erf'                         % my analytic toy model
+    Np=16; r0 = 7; r1 = 14;           % # petals, inner, outer radii in meters
+    beta = 3.0;                       % good for A gap and 1-A tip decay to 1e-5
+    A = @(r) erfc(beta*(2*r-(r0+r1))/(r1-r0))/2;
+    ms = 30:10:50;                      % m-conv vals
+   case 'NI2'                         % actual NI2 starshade, cubic interpolated
+    cwd = fileparts(mfilename('fullpath')); file = [cwd '/../occulter/NI2'];
+    [~,r0,r1] = eval_sister_apod(file,0);  % get r0,r1
+    A = @(r) eval_sister_apod(file,r);     % func
+    n = 40; ms = 200:50:400;                      % m-conv vals
+  end
+  
+  %profile clear; profile on;
+  [xj yj wj] = starshadequad(Np,A,r0,r1,n,ms(1));
+  %disp(sum(wj))
+  %profile off; profile viewer;   % mostly loading file :)
+  if verb, figure(1+i); clf; scatter(xj,yj,10,wj); axis equal tight; colorbar;
+    title(sprintf('%s',designs{d})); end
 
-[~,r0,r1] = eval_apod(0);  % get r0,r1
-A = @(r) eval_apod(r);    % func
-%profile clear; profile on;
-[xj yj wj] = starshadequad(Np,A,r0,r1,20,ms(1)); %disp(sum(wj))
-%profile off; profile viewer;   % mostly loading file :)
-if verb, figure(2); clf; scatter(xj,yj,10,wj); axis equal tight; colorbar; end
-
-for m=ms        % check area converged ...
-  [xj yj wj] = starshadequad(Np,A,r0,r1,20,m); disp(sum(wj))
+  fprintf('area convergence for design %s...\n',designs{d})
+  for m=ms
+    [xj yj wj] = starshadequad(Np,A,r0,r1,n,m); disp(sum(wj))
+  end
+  % NI2 case jumps around at 1e-6 rel level; sucky function, due to only C^1
+  % (A'' appears BV, discont)
 end
-% NI2 case jumps around at 1e-6 rel level; sucky function, due to only C^1.
+

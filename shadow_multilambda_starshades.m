@@ -65,5 +65,5 @@ for p=1:2, if p==2, Iplt = cummax(maxu2,1); end   % 2nd time max over disc
   axis xy tight; ylabel('radius \rho (m)'); xlabel('\lambda (\mu m)');
   colormap(jet); colorbar; caxis([-11 -3]); vline(lambdaint*1e6); clabel(C,h);
   title(sprintf('%s: log_{10} (max |u|^2 over %s) vs radius and lambda',design,sets{p}))
-  print('-dpng',['occulter/shadow_rholambda_' design '.png']);
+  %print('-dpng',['occulter/shadow_rholambda_' design '.png']);
 end
