@@ -1,0 +1,51 @@
+This directory contains a self-contained set of files pulled from
+SISTER/software and SISTER/config
+that evaluate a PSW basis for the NI2 ideal starshade.
+
+They have been hacked to use FRESNAP instead of BDWF,
+in the simplest case of non-spinning, ideal pupil. Code for more complicated
+cases has been gutted mercilessly, for intelligibility.
+
+The main test script is test_idealnonspinning.m
+which shows that the fresnap version computes the PSF basis in 2.5 seconds,
+a task previously taking 6.5 hrs (predicted), a speed up of around 10000 times.
+It also compares the first of the files output against a reference copy
+produced by the distributed SISTER code.
+
+You will need to have set up fresnap as in the instructions in README.md.
+
+The codes that have been hacked are:
+
+sister_basis.m : run_non_spinning(), ideal pupil case, severely
+                 changed to collate all targets, set up an areal quadrature
+                 from r and Profile in the occulter file, call fresnap_pts
+                 just once per lambda, then split the result into around 3000
+                 files (the last part is purely to match the BDWF version).
+makeStarshadeImage_fresnap_pts.m : severely hacked version of
+                 makeStarshadeImage.m, to be called only once,
+                 to leave just the occulter loading and
+                 pupil computation, then diffraction field eval via fresnap.
+WFIRST_starshade_basis_alex.m : simplified parameters/opt file for this test,
+                 adjusted from WFIRST_starshade_basis.
+Maybe a couple of other files are tweaked; a diff would indicate which.
+
+The other .m files are here so that SISTER/* does not need to be added to
+the matlab path; indeed, it should not be.
+
+The file
+starshade_UtotL_Nx_16_pix_0425_0552_dl_10nm_dr_0.0_mas_psi_0.0_deg_ideal.mat
+is in the git repo as a reference (it was computed via the BDWF version).
+
+Agreement in u amplitude to this file checks out to around 1e-6.
+The overall phase is not well-determined since Z/lambda ~ 1e13.
+
+See test_idealnonspinning.out
+
+Certainly other files (with off-axis sources) should be tested too.
+
+The PSW basis is written into files, namely
+SISTER/sister_basis/non-spinning/NI2_24_16/425_552_nm/starshade_UtotL_Nx_16_pix_0425_0552_dl_10nm_dr_*.mat
+where SISTER is its top-level directory.
+Edit the location of the actual SISTER directory in sister_installation_path.m
+
+Alex Barnett 9/15/20.

@@ -9,7 +9,7 @@ Nr=80; rho = linspace(0,4,Nr); Np = 1e2; phi = 2*pi*(1:Np)/Np;
 
 cwd = fileparts(mfilename('fullpath'));
 
-design = 'NI2';   % choose design from below list...
+design = 'erf';   % choose design from below list...
 switch design
  case 'HG'
   A = @(t) exp(-(t/0.6).^6);        % a Cash'11 "hyper-Gaussian" on [0,1]
@@ -45,7 +45,7 @@ if ~exist('lambdaint')              % get usage params from SISTER file
 end
 FN = Reff^2./(lambdaint*Z);
 mas = pi/180/60^2/1e3;            % one milliarcsecond
-fprintf('design %s: Reff=%.3g m, Z=%.0f km, Fres#=[%.2g,%.2g], geoIWA=%.3g mas\n',design,Reff,Z/1e3,min(FN),max(FN),(Reff/Z)/mas)
+fprintf('design %s: Reff=%.3g m, Z=%.0f km, Fres#=[%.2g,%.2g], geoIWA=%.3g mas\n',design,Reff,Z/1e3,min(FN),max(FN),(r1/Z)/mas)
 fprintf('\tapod: rel gap wid 1-A(%.5g)=%.3g, rel tip wid A(%.5g)=%.3g\n',r0,1-Afunc(r0),r1,Afunc(r1))
 
 [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb);   % fill areal quadr
