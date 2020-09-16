@@ -229,11 +229,11 @@ opt.save = 1 ;
     opt.make_occulter_name = opt.starshade.nominal_filename ;
     % makeStarshadeImage( opt ) ;     % ahb this reads all params from opt, writes to file (ugh). Why no output args used??
     t0=tic;
-    [u,lambdaIn,~,pupil] = makeStarshadeImage_fresnap_pts( opt, xi, eta) ;   % ahb hacked overrides targets with simple (xi,eta) list
+    [u,lambdaIn,~,pupil] = makeStarshadeImage_fresnaq_pts( opt, xi, eta) ;   % ahb hacked overrides targets with simple (xi,eta) list
     % output u is size Ntargs*Nlambdas but Nlambdas is not yet defined of course...
     n_lmbd = size(u,2);
     t=toc(t0);
-    disp( sprintf('makeStarshadeImage_fresnap_pts took %3.2f seconds, %3.2f per wavelength bin', t, t / n_lmbd ) )
+    disp( sprintf('makeStarshadeImage_fresnaq_pts took %3.2f seconds, %3.2f per wavelength bin', t, t / n_lmbd ) )
 
     % make the pupil once (no need to redo each i_px)...
     secondarySize = opt.secondary_size ; % If you're fine with a generic circular pupil with a secondary (but no struts), set this to the fraction of the radius the secondard covers (e.g. 0.2)

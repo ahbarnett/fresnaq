@@ -1,4 +1,4 @@
-% Demo of FRESNAP Frensel diffraction from occulter defined by parameterized
+% Demo of FRESNAQ Frensel diffraction from occulter defined by parameterized
 % curve, evaluating on grid and at arbitrary target points.
 % Barnett 9/8/20.
 
@@ -15,7 +15,7 @@ tol = 1e-9;            % desired accuracy
 verb = 1;              % verbosity
 
 ximax = 1.5; ngrid = 1e3;   % million-pt grid
-[u xigrid] = fresnap_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb);
+[u xigrid] = fresnaq_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb);
 ut = u(1,1); xi = xigrid(1); eta = xi;     % math check u in SW corner of grid
 fprintf('u(%.3g,%.3g) = %.12g + %.12gi\n',xi,eta,real(ut),imag(ut))
 % return                     % useful for convergence testing
@@ -37,7 +37,7 @@ if verb>1, figure(2); clf; imagesc(xigrid,xigrid,abs(u)'.^2); % fig for repo
 end
 
 M=1e6; xi = ximax*(2*rand(M,1)-1); eta = ximax*(2*rand(M,1)-1);  % million pts
-u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb);
+u = fresnaq_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb);
 figure(1); subplot(1,2,2);
 u = 1-u;               % again convert aperture to occulter
 scatter(xi,eta,10,log10(abs(u).^2));       % plotting a bit slow

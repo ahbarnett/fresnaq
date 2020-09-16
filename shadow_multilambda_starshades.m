@@ -1,4 +1,4 @@
-% FRESNAP for Fresnel diffraction from various starshades: shadow vs lambda.
+% FRESNAQ for Fresnel diffraction from various starshades: shadow vs lambda.
 % Ie, max_phi |u(rho,phi)|^2 vs rho and lambda, over design range & beyond.
 % Barnett 9/14/20
 clear; verb = 1;
@@ -55,7 +55,7 @@ Nl = 30; lambda = logspace(log10(lambdaint(1)*0.7),log10(lambdaint(2)*1.4),Nl);
 tol = 1e-6;
 tic; maxu2 = nan(Nr,Nl);   % alloc output, and do the calc...
 for l=1:Nl
-  u = fresnap_pts(xq,yq,wq, lambda(l)*Z, xi,eta, tol);
+  u = fresnaq_pts(xq,yq,wq, lambda(l)*Z, xi,eta, tol);
   maxu2(:,l) = max(abs(1-u).^2,[],2);   % Babinet u-1 for occulter, max over phi
 end
 toc

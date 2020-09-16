@@ -1,4 +1,4 @@
-% minimal running and math test of making a PSF basis, hacked to use FRESNAP.
+% minimal running and math test of making a PSF basis, hacked to use FRESNAQ.
 % Run time is a few seconds. See README.
 % Barnett 9/15/20
 

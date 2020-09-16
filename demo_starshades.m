@@ -1,4 +1,4 @@
-% Demo of FRESNAP computing Fresnel diffraction from various starshades.
+% Demo of FRESNAQ computing Fresnel diffraction from various starshades.
 % Barnett 9/8/20
 clear; verb = 1;  % verbosity
 
@@ -59,7 +59,7 @@ if verb>1, figure(1); clf; scatter(xq,yq,10,wq); axis equal tight; colorbar;
   drawnow
 end
 
-[u xigrid] = fresnap_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb);
+[u xigrid] = fresnaq_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb);
 it = 1; jt = 1;  % grid indices to test, eg (1,1) is SW corner of grid
 ut = u(it,jt); xi = xigrid(it); eta = xigrid(jt);     % math check u
 fprintf('u(%.3g,%.3g) = %.12g + %.12gi\n',xi,eta,real(ut),imag(ut))

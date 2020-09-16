@@ -1,14 +1,14 @@
-function u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb)
-% FRESNAP_PTS  fast scalar Fresnel aperture diffraction, arbitrary target points
+function u = fresnaq_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb)
+% FRESNAQ_PTS  fast scalar Fresnel aperture diffraction, arbitrary target points
 %
-% u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol)
+% u = fresnaq_pts(xq, yq, wq, lambdaz, xi, eta, tol)
 %  returns list of complex amplitude values u at (xi,eta) target points a const
 %  distance z downstream, for an aperture for which nodes (xq,yq) and weights
 %  wq are a good areal quadrature scheme in the (x,y) aperture plane, to
 %  accuracy tol, for a single-wavelength unit amplitude plane incident wave,
 %  in the scalar Fresnel approximation, not including propagation prefactor.
 %
-% u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb) also reports text.
+% u = fresnaq_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb) also reports text.
 %
 % Without any arguments, does self-test.
 %
@@ -51,10 +51,10 @@ function u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb)
 %
 %  The algorithm uses a 2D type 3 NUFFT; depends on FINUFFT library.
 %
-%  Example: see test_fresnap_pts
+%  Example: see test_fresnaq_pts
 
 % Barnett 9/5/20
-if nargin==0, test_fresnap_pts; return; end
+if nargin==0, test_fresnaq_pts; return; end
 if nargin<8, verb = 0; end
 
 t0=tic;
@@ -66,10 +66,10 @@ u = finufft2d3(xq,yq, cq, -1, tol, sc*xi(:),sc*eta(:), o);  % do the work
 kirchfac = 1/(1i*lambdaz);                           % Kirchhoff prefactor
 u = kirchfac * (u .* exp((1i*pi/lambdaz)*(xi(:).^2+eta(:).^2)));  % postmult bit
 u = reshape(u,size(xi));
-if verb, fprintf('fresnap_pts: N=%d quadr, M=%d targs, %.3g s\n',numel(xq),numel(xi),toc(t0)), end
+if verb, fprintf('fresnaq_pts: N=%d quadr, M=%d targs, %.3g s\n',numel(xq),numel(xi),toc(t0)), end
 
 %%%%
-function test_fresnap_pts
+function test_fresnaq_pts
 fresnum = 10.0;        % Fresnel number
 lambdaz=1/fresnum;   % since we test with O(1) radius aperture
 g = @(t) 1 + 0.3*cos(3*t);   % smooth radial func on [0,2pi)
@@ -77,11 +77,11 @@ n=350; m=120; [xq yq wq] = polarareaquad(g,n,m);   % areal quadrature
 tol = 1e-6;
 
 xi = 1.5; eta = -0.5;   % math test: target to test at
-u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol)
+u = fresnaq_pts(xq, yq, wq, lambdaz, xi, eta, tol)
 kirchfac = 1/(1i*lambdaz);   % Kirchhoff prefactor
 ud = kirchfac * sum(exp((1i*pi/lambdaz)*((xq-xi).^2+(yq-eta).^2)) .* wq)
 fprintf('abs error vs direct Fresnel quadr at (%.3g,%.3g) = %.3g\n\n',xi,eta,abs(u-ud))
 
 M=1e6; xi = rand(M,1); eta = rand(M,1);   % speed test: bunch of targets
 verb = 1;
-u = fresnap_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb);
+u = fresnaq_pts(xq, yq, wq, lambdaz, xi, eta, tol, verb);

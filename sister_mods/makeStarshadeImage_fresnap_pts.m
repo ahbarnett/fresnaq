@@ -1,13 +1,13 @@
-% [ u lambdaIn vecPetalArray pupil opt ] = makeStarshadeImage_fresnap_pts( opt_in, xi, eta)
+% [ u lambdaIn vecPetalArray pupil opt ] = makeStarshadeImage_fresnaq_pts( opt_in, xi, eta)
 %
 % Hacked version of makeStarshadeImage, with two additional inputs (xi,eta), overriding target list
 % Does not save to file, rather, returns u, a Ntarg * n_lmbd complex array of diffraction field at targets.
-% Uses fresnap_pts, after building areal quadrature, under the hood. No rotation is done, because
+% Uses fresnaq_pts, after building areal quadrature, under the hood. No rotation is done, because
 % targets should be rotated leaving the occulter source the same.
 % Only ideal pupil works. The occulter file must have "r" field.
 %
 % I have not documented this file since there are many aspects I do not understand. However,
-% please see the docs for FRESNAP_PTS and STARSHADEQUAD.
+% please see the docs for FRESNAQ_PTS and STARSHADEQUAD.
 
 % Barnett 9/15/20.
 
@@ -32,7 +32,7 @@
 %
 % THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT H/home/alex/physics/starshade/SISTER/softwareOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function [u lambdaIn vecPetalArray pupil opt ] = makeStarshadeImage_fresnap_pts( opt_in, xi, eta)
+function [u lambdaIn vecPetalArray pupil opt ] = makeStarshadeImage_fresnaq_pts( opt_in, xi, eta)
 
 % makeStarshadeImage
 % A sample program which creates a locus of edge point from an apodization
@@ -124,24 +124,24 @@ deltaY = 0;
 % Step 3: Compute field at 
 %--------------------------
 
-% ahb inserts setup for areal quadr needed by fresnap: assumes r,Profile in occulterName file
+% ahb inserts setup for areal quadr needed by fresnaq: assumes r,Profile in occulterName file
 [~,r0,r1] = eval_sister_apod(occulterName,0);   % get apodization range [r0,r1]
 Afunc = @(r) eval_sister_apod(occulterName,r);  % func handle (reads file when called)
 Np = opt.n_ptl;
 n = 40; m = 300;  % NI2 areal quadr params (should go in occulter file) ... need to check converged (see eg demo_starshades)
 verb = 1;
 [xq yq wq] = starshadequad(Np,Afunc,r0,r1,n,m,verb);   % ahb: fill areal quadr
-% Propagate to telescope aperture plane with fresnap, each lambda in turn...
+% Propagate to telescope aperture plane with fresnaq, each lambda in turn...
 tol = 1e-7;   % accuracy of Fourier bit
 t0=tic;
 u = nan(numel(xi), numel(lambdaIn));
 for l=1:numel(lambdaIn)
   fprintf('lambda=%.3g um...\n',lambdaIn(l)*1e6);
-  u_aper = fresnap_pts(xq,yq,wq, lambdaIn(l)*Z, xi,eta, tol);  % diffract to all targs at once
+  u_aper = fresnaq_pts(xq,yq,wq, lambdaIn(l)*Z, xi,eta, tol);  % diffract to all targs at once
   u(:,l) = 1-u_aper;    % Babinet and stack
 end
 t=toc(t0);
-fprintf('fresnap_pts (%d sources to %t targets, %d lambdas) took %3.2f seconds, %3.2f per wavelength bin', numel(xq),numel(xi),n_lmbd, t, t / n_lmbd)
+fprintf('fresnaq_pts (%d sources to %t targets, %d lambdas) took %3.2f seconds, %3.2f per wavelength bin', numel(xq),numel(xi),n_lmbd, t, t / n_lmbd)
 % ahb done
 
 % ahb gutted the save bit, moved to sister_basis hacked.

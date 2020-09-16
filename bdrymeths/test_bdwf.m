@@ -51,7 +51,7 @@ psi2 = atan2(-eta,-xi);
 ub3 = bdwf_pts(bx, by, [], Z, lambda, 0,0, psi1, psi2);
 fprintf('bdwf (n=%d) change of incidence: %.3g, should be O(psi1^2)=%.3g\n',n,abs(ub-ub3),psi1^2)
 
-% now test bdwf: check a (xi,eta) target grid matches fresnap_pts result...
+% now test bdwf: check a (xi,eta) target grid matches fresnaq_pts result...
 dxO = 0.1; nO = 10; deltaX = 0.23; deltaY = -0.16;   % generic
 [xi,eta] = make_grid_bdwf(dxO, nO, deltaX, deltaY);
 t = 2*pi*(0:n-1)/n; bx = x(t); by = y(t);      % bdry points
@@ -59,10 +59,10 @@ t0 = tic;
 ub = bdwf(bx,by,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);  % what we test
 t0 = toc(t0);
 tol = 1e-9;
-u = fresnap_pts(xq, yq, wq, lambdaz, xi(:), eta(:), tol);    % col vec of targs
+u = fresnaq_pts(xq, yq, wq, lambdaz, xi(:), eta(:), tol);    % col vec of targs
 u = 1-u;
 u = u * exp(2i*pi*Z/lambda);       % we didn't yet include plane z-propagation
-fprintf('bdwf (n=%d) grid max err vs fresnap_pts: %.3g\n',n,norm(ub(:)-u,inf))
+fprintf('bdwf (n=%d) grid max err vs fresnaq_pts: %.3g\n',n,norm(ub(:)-u,inf))
 % is consistent w/ bdwf_pts error, fine.
 figure; plot(xi,eta,'k.'); hold on; plot([bx bx(1)], [by by(1)], '-');
 axis equal tight; title('test\_bdwf grid targets');
