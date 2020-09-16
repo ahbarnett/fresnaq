@@ -37,12 +37,27 @@ how to call the library.
 The above example is produced by setting ``verb=2`` in ``demo_paramcurve.m``.
 Since areal quadratures are key, there are various
 quadrature helper routines in ``util`` used in the tests and demos.
+One starshade description file is shipped in ``occulters``, along with
+some preliminary shadow results as PNGs.
+
+# example application to SISTER PSF basis
+
+The directory ``sister_mods`` contains a self-contained subset of the SISTER
+codes, essentially ``sister_basis.m`` and everything it requires, severely
+hacked to use FRESNAP instead of BDWF. The speed-up achieved is around
+10000x, not including file I/O, and one PSF pupil grid is validated to
+6-digit accuracy.
 
 # alternative boundary line integral methods
 
-See ``bdrymeths`` directory for BDWF and the non-singular line integral method
-for the Fresnel approximation.
-Note that term "boundary integral" refers to a aperture boundary line integral methods, and should not be confused with 
-3D integral-equation based wave scattering method (which would go beyond
-the Fresnel approximation, and are significantly harder).
+See ``bdrymeths`` directory for BDWF and the new non-singular line integral (NSLI) method for Fresnel scalar diffraction.
+BDWF was needed as the current state of the art; we ship a documented version
+of Cady's code. This is used for speed comparisons and validation.
+NSLI is a cleaner and mathematically more simple version of BDWF
+in the on-axis, constant-z case,
+which also can achieve high-order accuracy (unlike BDWF which appears 1st-order),
+when fed an appropriate boundary quadrature. NSLI contains only around eight lines of code.
 
+.. note::
+
+The term "boundary integral" refers to a aperture boundary line integral methods, and should not be confused with 3D integral-equation based wave scattering methods (which would go beyond the Fresnel approximation, and are significantly more time consuming and harder to code).
