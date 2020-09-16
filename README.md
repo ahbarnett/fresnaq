@@ -58,6 +58,6 @@ in the on-axis, constant-z case,
 which also can achieve high-order accuracy (unlike BDWF which appears 1st-order),
 when fed an appropriate boundary quadrature. NSLI contains only around eight lines of code.
 
-.. note::
+ .. note::
 
 The term "boundary integral" refers to a aperture boundary line integral methods, and should not be confused with 3D integral-equation based wave scattering methods (which would go beyond the Fresnel approximation, and are significantly more time consuming and harder to code).
