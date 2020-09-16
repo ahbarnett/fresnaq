@@ -9,7 +9,7 @@ Nr=80; rho = linspace(0,4,Nr); Np = 1e2; phi = 2*pi*(1:Np)/Np;
 
 cwd = fileparts(mfilename('fullpath'));
 
-design = 'erf';   % choose design from below list...
+design = 'NI2';   % choose design from below list...
 switch design
  case 'HG'
   A = @(t) exp(-(t/0.6).^6);        % a Cash'11 "hyper-Gaussian" on [0,1]

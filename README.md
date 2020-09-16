@@ -1,7 +1,7 @@
 # fresnaq
 
-**FRESN**el **AP**ertures: 
-Fast non-uniform Fourier areal quadrature
+**FRESN**el **A**real *Q*uadrature:
+Fast non-uniform Fourier
 method for computation of scalar Fresnel diffraction from
 0-1 (hard-edged) apertures and occulters. The simulation of the optics
 of [starshades](http://sister.caltech.edu/) for exoplanet imaging

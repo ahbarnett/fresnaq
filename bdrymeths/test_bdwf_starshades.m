@@ -4,7 +4,7 @@
 clear all; verb = 1;
 
 lambda = 4.27e-7;      % generic wavelength, blue (meters)
-Z = 2.5e7;             % downstream distance (meters) ... good for Reff~10m
+Z = 2.5e7;             % downstream distance (meters) ... can override below
 
 % we copy the starshade profile shapes (for now) from ../demo_starshades.m:
 design = 'NI2';   % choose design from below list...
@@ -31,14 +31,16 @@ switch design
  case 'NI2'                         % actual NI2 starshade, cubic interpolated
   cwd = fileparts(mfilename('fullpath')); file = [cwd '/../occulter/NI2'];
   Np = 24;                          % petals told cut off harshly at r1 ...bad
+  Z = 37.2e6;                       % narrow range of lambda.Z
   [~,r0,r1] = eval_sister_apod(file,0);   % get apodization range [r0,r1]
   Afunc = @(r) eval_sister_apod(file,r);  % func handle (reads file when called)
   % try destroying the 1e-2 Poisson spot due to both petal flat ends...
   %Afunc = @(r) Afunc(r).*((r<=12) + (r>12).*cos(pi/2*(r-12)).^2); % C^1 blend
   %Afunc = @(r) 1 - (1-Afunc(r)).*((r>=6) + (r<6).*cos(pi/2*(6-r)).^2);  % "
   n = 40; m = 400;    % use quad_conv_apod_NI2 converged m (to 1e-6), lz>=5
- case 'NW2'                         % actual NI2 starshade, cubic interpolated
+ case 'TV3'                         % actual NI2 starshade, cubic interpolated
   file = '/home/alex/physics/starshade/SISTER/input_scenes/locus/in/TV3';
+  Z = 76.6e6;                       % from their file
   Np = 24;                          % petals told cut off harshly at r1 ...bad
   [~,r0,r1] = eval_sister_apod(file,0);   % get apodization range [r0,r1]
   Afunc = @(r) eval_sister_apod(file,r);  % func handle (reads file when called)
