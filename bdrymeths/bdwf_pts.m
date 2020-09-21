@@ -271,7 +271,7 @@ tic
         end
 %toc
 %make_a_stop
-whos        
+
         for qq = 1:nLambda
             eikz = exp(1i*p2l(qq)*Z);
             E(:,qq) = eikz./(2*pi).*E(:,qq);
