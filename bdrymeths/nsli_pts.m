@@ -50,7 +50,9 @@ function u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta)
 % 3) This is nearly a drop-in replacement for bdwf, in the flat aperture,
 %  psi1=0 (on-axis), small-angle case. The difference is that a line integral
 %  quadrature is demanded, allowing high-order accuracy, and that no in/out
-%  target point testing is needed.
+%  geometric shadow target point testing is needed.
+%
+% Also see: NSLI_EMULATES_BDWF
 
 % Barnett 9/13/20
 if nargin==0, test_nsli_pts; return; end

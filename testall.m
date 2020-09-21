@@ -38,3 +38,4 @@ show_sister_profiles
 test_makePupil
 test_idealnonspinning          % this needs user to point to SISTER dir
 
+dbclear all     % remove annoying error -> debug mode

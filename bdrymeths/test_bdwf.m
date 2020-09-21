@@ -1,5 +1,5 @@
 % test BDWF with generic targets on simple occulter shapes that we understand.
-% Barnett 9/10/20
+% Barnett 9/10/20; found BDWF needs repeated point 9/21/20.
 
 % parameterization of smooth closed curve, for t in [0,2pi)...
 x = @(t) 0.5*cos(t)+0.5*cos(2*t); y = @(t) sin(t);          % kite shape
@@ -22,33 +22,34 @@ psi1=0; psi2=0;     % on-axis incident wave, and no Z variation
 lambda = 1.1e-5;      % generic, typ wavelength rel to size, makes Z big
 Z = lambdaz/lambda;
 ud = ud * exp(2i*pi*Z/lambda)       % ud didn't yet include plane z-propagation
-ub = bdwf_pts(bx,by, [], Z, lambda, xi, eta, psi1, psi2)
+% note for some reason bdwf needs the last bdry pt to repeat the first!:
+ub = bdwf_pts([bx bx(1)],[by by(1)], [], Z, lambda, xi, eta, psi1, psi2)
 fprintf('bdwf (n=%d) err vs direct Fresnel quadr: %.3g\n',n,abs(ub-ud))
 
 % convergence study of bdwf wrt n...
-ns = 100*2.^(1:9);
+ns = 100*2.^(1:6);
 errs = 0*ns;
 disp('                      n         err of bdwf vs truth')
 for i=1:numel(ns), n=ns(i);
   t = 2*pi*(0:n-1)/n; bx = x(t); by = y(t);      % bdry points
-  ub = bdwf_pts(bx,by, [], Z, lambda, xi, eta, psi1, psi2);
+  ub = bdwf_pts([bx bx(1)],[by by(1)], [], Z, lambda, xi, eta, psi1, psi2);
   errs(i) = abs(ub-ud);
   disp([n errs(i)])
 end
 figure; loglog(ns, errs, '+-'); axis tight; title('bdwf convergence to true');
 xlabel('n (bdry nodes)');
-hold on; plot(ns,1.0./ns,'r-');   % appears to be only 1st-order (!) in h~1/n
-legend('bdwf(n) err vs true', '1st order');
+hold on; plot(ns,30.0./ns.^2,'r-');
+legend('bdwf(n) err vs true', '2nd order (expected)');
 % also: if lambda<=1e6 then Z>=5e4, and does not converge due to ill-defined phase
 
 % check translational invariance...
-ub2 = bdwf_pts(bx-xi, by-eta, [], Z, lambda, 0,0, psi1, psi2);
+ub2 = bdwf_pts([bx bx(1)]-xi, [by by(1)]-eta, [], Z, lambda, 0,0, psi1, psi2);
 fprintf('bdwf (n=%d) change due to translation: %.3g\n',n,abs(ub-ub2))
 
 % check incident angle corresp to translation of targs by (-xi,-eta)...
 psi1 = sqrt(xi^2+eta^2)/Z;
 psi2 = atan2(-eta,-xi);
-ub3 = bdwf_pts(bx, by, [], Z, lambda, 0,0, psi1, psi2);
+ub3 = bdwf_pts([bx bx(1)],[by by(1)], [], Z, lambda, 0,0, psi1, psi2);
 fprintf('bdwf (n=%d) change of incidence: %.3g, should be O(psi1^2)=%.3g\n',n,abs(ub-ub3),psi1^2)
 
 % now test bdwf: check a (xi,eta) target grid matches fresnaq_pts result...
@@ -56,7 +57,7 @@ dxO = 0.1; nO = 10; deltaX = 0.23; deltaY = -0.16;   % generic
 [xi,eta] = make_grid_bdwf(dxO, nO, deltaX, deltaY);
 t = 2*pi*(0:n-1)/n; bx = x(t); by = y(t);      % bdry points
 t0 = tic;
-ub = bdwf(bx,by,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);  % what we test
+ub = bdwf([bx bx(1)],[by by(1)],[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);  % what we test
 t0 = toc(t0);
 tol = 1e-9;
 u = fresnaq_pts(xq, yq, wq, lambdaz, xi(:), eta(:), tol);    % col vec of targs
@@ -74,7 +75,7 @@ fprintf('bdwf one lambda (n=%d, nTargs=%d) in %.3g s = %.3g targ-bdry pairs/s\n'
 % multi wavelength speed test...
 Nl = 10; lambda = lambda*linspace(1,2,Nl);
 t0 = tic;
-ub = bdwf(bx,by,[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);
+ub = bdwf([bx bx(1)],[by by(1)],[], Z, lambda, dxO, nO, 0,0, deltaX, deltaY);
 t0 = toc(t0);
 fprintf('bdwf %d lambdas (n=%d, nTargs=%d) in %.3g s = %.3g targ-bdry pairs/s\n',Nl,n,nO^2,t0,Nl*nO^2*n/t0)
 % bdwf speed = 7e7 pairs/sec on laptop; ie multi-lambda is 2x faster.
