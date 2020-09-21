@@ -42,8 +42,8 @@
 %   direction from on-axis (psi1=0) to:
 %      psi1 = sqrt(xi0^2+eta0^2) / Z
 %      psi2 = atan2(eta0,xi0)
-% 2) The xVals, yVals list *must repeat* the first point as the last; this is
-%   just how their input format is.
+% 2) The xVals, yVals (and zVals if relevant) lists *must repeat* the first
+%   point as the last; this is just how their input format is.
 % 3) For a smooth domain, 2nd-order accuracy in n, the number of boundary
 %   points, is expected. This is due to use of the midpoint as opposed to
 %   trapezoid rule. (In contrast, see NSLI.)

@@ -22,8 +22,10 @@
 %
 % Inputs:
 %   xVals, yVals - vectors of ordered boundary point x,y (in-plane) coords,
-%                  in meters.
-%   zVals - z coords (along viewing axis), in meters. If empty, 0 is used.
+%                  with the last point *repeating* the first, in meters.
+%                  Ie, if an n-point quadrature is used, these are length n+1.
+%   zVals - z coords (along viewing axis), in meters, length n+1.
+%           If empty, 0 is used.
 %   Z - downstream propagation distance, in meters
 %   lambda - set of wavelengths (vector length nLambda), in meters
 %   dxO - target grid spacing in both eta and xi directions, in meters
@@ -40,12 +42,17 @@
 %                    eta = -deltaY + ((-nO+1)/2 : (nO-1)/2) * dxO
 %
 % Notes:
-%   Translation of the occulter (xVals,yVals) by (xi0,eta0) is
+%  1) Translation of the occulter (xVals,yVals) by (xi0,eta0) is
 %   equivalent to translation (-deltaX,-deltaY) of the detector grid by
 %   (-xi0,-eta0), which is also equivalent, up to accuracy O(psi1^2), to
 %   changing the incident direction from on-axis (psi1=0) to:
 %      psi1 = sqrt(xi0^2+eta0^2) / Z
 %      psi2 = atan2(eta0,xi0)
+% 2) The xVals, yVals (and zVals if relevant) lists *must repeat* the first
+%   point as the last; this is just how their input format is.
+% 3) For a smooth domain, 2nd-order accuracy in n, the number of boundary
+%   points, is expected. This is due to use of the midpoint as opposed to
+%   trapezoid rule. (In contrast, see NSLI.)
 %
 % For testing, see test_bdwf.m
 %
