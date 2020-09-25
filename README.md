@@ -3,7 +3,8 @@
 **FRESN**el **A**real **Q**uadrature:
 Fast non-uniform Fourier
 method for computation of scalar Fresnel diffraction from
-0-1 (hard-edged) apertures and occulters. The simulation of the optics
+binary (hard-edged) apertures and occulters, in MATLAB/Octave.
+The simulation of the optics
 of [starshades](http://sister.caltech.edu/) for exoplanet imaging
 is one application.
 
@@ -13,8 +14,8 @@ is one application.
 
 # requirements
 
-* MATLAB
-* [FINUFFT](https://github.com/flatironinstitute/finufft) preferably v2.0
+* MATLAB (has been tested back to R2016b), or Octave (version >= 4.4)
+* [FINUFFT](https://github.com/flatironinstitute/finufft) preferably >= v2.0.0
 
 # installation and testing
 
@@ -50,12 +51,13 @@ hacked to use FRESNAQ instead of BDWF. The speed-up achieved is around
 
 # reference boundary line integral methods
 
-See ``bdrymeths`` directory for BDWF and the new non-singular line integral (NSLI) method for Fresnel scalar diffraction.
+See ``bdrymeths`` directory for BDWF and the new reference non-singular line integral (NSLI) method for Fresnel scalar diffraction.
 BDWF was needed as the current state of the art; we ship a documented version
-of Cady's code from SISTER. This is used for speed comparisons and validation.
-NSLI is a cleaner and mathematically more simple version of BDWF
+of Cady's code from SISTER v1.1.
+This is used for speed comparisons and validation.
+NSLI is a more robust and mathematically simpler formulation
 in the on-axis, constant-z case,
-which also can achieve high-order accuracy (unlike BDWF which appears 1st-order),
-when fed an appropriate boundary quadrature. NSLI contains only around eight lines of code.
+which also can achieve high-order accuracy (unlike BDWF which is 2nd-order),
+when fed an appropriate boundary quadrature. NSLI contains only around eight lines of code (but much more in the form of documentation and testing).
 
 **Note**: The term "boundary integral" refers to a line integral over the aperture/occulter boundary, and should not be confused with 3D integral-equation based wave scattering methods (which would go beyond the Fresnel approximation, and are significantly more time consuming and harder to code).

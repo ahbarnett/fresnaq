@@ -69,9 +69,9 @@ fprintf('bdwf (n=%d) grid max err vs fresnaq_pts: %.3g\n',n,norm(ub(:)-u,inf))
 figure; plot(xi,eta,'k.'); hold on; plot([bx bx(1)], [by by(1)], '-');
 axis equal tight; title('test\_bdwf grid targets');
 
-% check bdry_pts matches bdry for the grid of the latter...
+% check bdwf_pts matches bdwf...
 ubp = bdwf_pts([bx bx(1)],[by by(1)],[],Z, lambda, xi(:),eta(:),0,0);
-fprintf('bdwf (n=%d) max diff vs bdry_pts with grid sent in: %.3g\n',n,norm(ub(:)-ubp(:),inf))
+fprintf('bdwf (n=%d) max diff vs bdwf_pts with grid sent in: %.3g\n',n,norm(ub(:)-ubp(:),inf))
 
 % report speed results...
 fprintf('bdwf one lambda (n=%d, nTargs=%d) in %.3g s = %.3g targ-bdry pairs/s\n',n,nO^2,t0,nO^2*n/t0)

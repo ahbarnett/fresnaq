@@ -47,10 +47,12 @@ function u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta)
 %  This makes u -> 1 in the limit of large Fresnel number.
 %  Simply subtract from 1 to turn an aperture into an occulter.
 %
-% 3) This is nearly a drop-in replacement for bdwf, in the flat aperture,
-%  psi1=0 (on-axis), small-angle case. The difference is that a line integral
-%  quadrature is demanded, allowing high-order accuracy, and that no in/out
-%  geometric shadow target point testing is needed.
+% 3) This is nearly a drop-in improvement over bdwf, in the flat aperture,
+%  psi1=0 (on-axis) case. One difference is that vector line integral
+%  quadrature weights are requested, not merely the nodes, allowing high-order
+%  accuracy. It is robust for targets arbitrarily near the aperture boundary,
+%  obviates any tests for targets being in geometric shadow, yet has very
+%  similar speed, and is also a much simpler code.
 %
 % Also see: NSLI_EMULATES_BDWF
 
