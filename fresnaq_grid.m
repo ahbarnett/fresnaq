@@ -83,7 +83,8 @@ cq = exp((1i*pi/lambdaz)*(xq.^2+yq.^2)) .* wq;       % premult by quadratic bit
 if maxNU>3*pi                            % only do if needed, since a bit slow
   xq = mod(xq,2*pi/dk); yq = mod(yq,2*pi/dk);     % wrap in case grid too coarse
 end
-u = finufft2d1(dk*xq, dk*yq, cq, -1, tol, ngrid, ngrid);    % do it
+o = []; if verb>1, o.debug = 2; end                  % FINUFFT reporting
+u = finufft2d1(dk*xq, dk*yq, cq, -1, tol, ngrid, ngrid, o);    % do it
 % postmult by quadr bit (outer prod since separable grid)...
 u = u .* (exp((1i*pi/lambdaz)*xigrid(:).^2) * exp((1i*pi/lambdaz)*xigrid.^2));
 kirchfac = 1/(1i*lambdaz);                           % Kirchhoff prefactor

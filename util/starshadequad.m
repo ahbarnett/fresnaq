@@ -1,7 +1,7 @@
 function [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb,Aquad)
 % STARSHADEQUAD  quadrature for area integral over apodized petal 0-1 occulter.
 %
-% [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb)
+% [xj yj wj bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb,Aquad)
 %
 %  Uses Theta(r) formula of (1)-(2) in Cady '12 to build area quadrature scheme
 %  over starshade, given apodization function and other geometric parameters.

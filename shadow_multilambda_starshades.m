@@ -3,20 +3,21 @@
 % Barnett 9/14/20
 clear; verb = 1;
 
-% targets: polar grid (roh,phi) in Vanderbei notation; radii (m) and angles...
+% targets: polar grid (rho,phi) in Vanderbei notation; radii (m) and angles...
 Nr=80; rho = linspace(0,4,Nr); Np = 1e2; phi = 2*pi*(1:Np)/Np;
 [rr pp] = ndgrid(rho,phi); xi = rr.*cos(pp); eta = rr.*sin(pp);  % (xi,eta)'s
 
 cwd = fileparts(mfilename('fullpath'));
 
-design = 'NI2';   % choose design from below list...
+design = 'HG';   % choose design from below list...
 switch design
- case 'HG'
-  A = @(t) exp(-(t/0.6).^6);        % a Cash'11 "hyper-Gaussian" on [0,1]
-  Np = 16; r0 = 7; r1 = 14;         % # petals, inner, outer radii in meters
-  Reff = (r0+r1)/2;
-  Afunc = @(r) A((r-r0)/(r1-r0));   % apodization vs radius in meters
-  Z = 3e7; lambdaint = [4e-7 1.1e-6];
+ case 'HG'        % a Cash'11 "offset hyper-Gaussian" from his paper
+  Np = 16;         % appears from Fig. 4, but mentions Np=12 too.
+  a = 12.5; b = a; pow=6;             % a,b in meters.  pow is his "n"
+  Z=8e7;                              % 80000km (big and far, to get IWA)
+  Afunc = @(r) exp(-((r-a)/b).^pow);  % "offset hyper-Gaussian" in r
+  r0 = a; r1 = 31; Reff=a+b;          % r1 = outer max radius, meters.
+  lambdaint = [3e-7 1e-6];            % listed p.2.
   n = 30; m = 80;
  case 'erf'                         % my analytic toy model, similar r0,r1
   Np=16; r0 = 7; r1 = 14;           % # petals, inner, outer radii in meters
@@ -45,7 +46,7 @@ if ~exist('lambdaint')              % get usage params from SISTER file
 end
 FN = Reff^2./(lambdaint*Z);
 mas = pi/180/60^2/1e3;            % one milliarcsecond
-fprintf('design %s: Reff=%.3g m, Z=%.0f km, Fres#=[%.2g,%.2g], geoIWA=%.3g mas\n',design,Reff,Z/1e3,min(FN),max(FN),(r1/Z)/mas)
+fprintf('design %s: Reff=%.3g m, Z=%.0f km, Fres#=[%.2g,%.2g], geo(eff)IWA=%.3g(%.3g) mas\n',design,Reff,Z/1e3,min(FN),max(FN),(r1/Z)/mas,(Reff/Z)/mas)
 fprintf('\tapod: rel gap wid 1-A(%.5g)=%.3g, rel tip wid A(%.5g)=%.3g\n',r0,1-Afunc(r0),r1,Afunc(r1))
 
 [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb);   % fill areal quadr

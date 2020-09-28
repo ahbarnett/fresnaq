@@ -1,17 +1,19 @@
 % Demo of FRESNAQ Frensel diffraction from occulter defined by parameterized
 % curve, evaluating on grid and at arbitrary target points.
 % Barnett 9/8/20.
+clear
 
 % parameterization of smooth closed curve, for t in [0,2pi)...
 x = @(t) 0.5*cos(t)+0.5*cos(2*t); y = @(t) sin(t);
 fresnum = 20.0;        % Fresnel number (if char radius were R=1).
-lambdaz=1/fresnum;     % wavelength times dist, recall Fres # = R^2/(lambda.z)
 n = 600; m = 100;      % depend on Fresnel number; convergence must be tested
+
+lambdaz=1/fresnum;     % wavelength times dist, recall Fres # = R^2/(lambda.z)
 t = 2*pi*(0:n-1)/n; bx = x(t); by = y(t);      % bdry points
 bxp = perispecdiff(bx); byp = perispecdiff(by);  % derivatives wrt t (if smooth)
 [xq yq wq] = curveareaquad(bx,by,(2*pi/n)*bxp,(2*pi/n)*byp,m);   % areal quadr
 % The rest of this code is same as demo_radial.m ...
-tol = 1e-9;            % desired accuracy
+tol = 1e-9;            % desired accuracy in u (as opposed to intensity)
 verb = 1;              % verbosity
 
 ximax = 1.5; ngrid = 1e3;   % million-pt grid
@@ -29,11 +31,11 @@ imagesc(xigrid,xigrid,log10(abs(u)'.^2));  % note transpose: x is fast, y slow.
 colorbar; hold on; plot(bx,by,'k-'); axis xy equal tight;
 xlabel('\xi'); ylabel('\eta'); title('log_{10} |u|^2, occulter, grid');
 
-if verb>1, figure(2); clf; imagesc(xigrid,xigrid,abs(u)'.^2); % fig for repo
-  colormap(hot(256)); colorbar; hold on; plot([bx;bx(1)],[by;by(1)],'w-');
+if verb, figure(2); clf; imagesc(xigrid,xigrid,abs(u)'.^2); % fig for repo
+  colormap(hot(256)); colorbar; hold on; plot([bx bx(1)],[by by(1)],'w-');
   axis xy equal tight;
   xlabel('\xi'); ylabel('\eta'); title('|u|^2, occulter, grid');
-  v=caxis; caxis([0 v(2)]); drawnow; print -dpng -r50 kite_grid.png
+  v=caxis; caxis([0 v(2)]); drawnow; %print -dpng -r50 kite_grid.png
 end
 
 M=1e6; xi = ximax*(2*rand(M,1)-1); eta = ximax*(2*rand(M,1)-1);  % million pts
