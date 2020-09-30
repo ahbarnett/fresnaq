@@ -11,7 +11,8 @@ function [wx wy] = crudecurvequad(bx, by)
 %  for all smooth (in R2 -> R2) functions F. The trap. rule corresponds to
 %  linear interpolation of the integrand between nodes, of course.
 %
-%  With no arguments, does self test, showing 2nd order (1/n^2) accuracy.
+%  With no arguments, does self test, showing expected 2nd order (1/n^2)
+%  accuracy.
 
 % Barnett 9/13/20
 if nargin==0, test_crudecurvequad; return; end

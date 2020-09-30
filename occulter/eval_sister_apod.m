@@ -32,14 +32,14 @@ x = o.r(inds); x = x(:); y = o.Profile(inds);   % x=ordinates, y=data, col vecs
 
 meth = 'spline'; % 'pchip'    % no different, to 1e-8 with their sample dr=2mm
 if isempty(r)                   % if func handles ok
-  A = @(r) Aintpad(r0,r1,x,y,r,meth);   % turn eval meth into handle
+  A = @(r) Aintpad(r0,r1,x,y,r,meth);      % turn eval meth into handle
   if wantAp
-    Ap = @(r) Apintpad(r0,r1,x,y,r,meth);   % turn eval meth into handle
+    Ap = @(r) Apintpad(r0,r1,x,y,r,meth);  % "
   end
 else
-  A = Aintpad(r0,r1,x,y,r,meth);
+  A = Aintpad(r0,r1,x,y,r,meth);       % just evaluate on given r
   if wantAp
-    Ap = Apintpad(r0,r1,x,y,r,meth);
+    Ap = Apintpad(r0,r1,x,y,r,meth);   % "
   end
 end
 
@@ -55,10 +55,8 @@ function Ap = Apintpad(r0,r1,x,y,r,meth)  % A' interp vals, pad outside [r0,r1]
 Ap = 0*r;
 ii = find(r>=r0 & r<=r1);
 if sum(ii)>0
-  h = 1e-5;                   % centered-diff estimates (expect 1e-10 err)
-  rcd = kron(r(ii),[1 1]) + kron(1+0*ii,[-h h]);  % new r either side of old
-  Acd = interp1(x,y,rcd,meth);        % interpolate off given samples to rcd
-  Ap(ii) = (1/(2*h)) * (Acd(2:2:end)-Acd(1:2:end)); 
+  h = 1e-5;                   % centered-diff estimates (expect O(h^2) err)
+  Ap(ii) = (interp1(x,y,r(ii)+h,meth) - interp1(x,y,r(ii)-h,meth)) / (2*h);
 end  
 
 
@@ -66,16 +64,23 @@ end
 %%%%%%
 function test_eval_sister_apod
 cwd = fileparts(mfilename('fullpath')); filehead = [cwd '/NI2'];  % in repo
-eps = 1e-10;    % negligible but needed to avoid hitting 0 or 1 regions
+
 % test handles out...
 [A,r0,r1,Ap] = eval_sister_apod(filehead);
-fprintf('1-A(%.5g)=%.3g, A(%.5g)=%.3g\n',r0,1-A(r0+eps),r1,A(r1-eps))  % check decay
+eps = 1e-10;    % negligible but needed to avoid hitting 0 or 1 regions
+a = r0+eps; b = r1-eps;
+fprintf('1-A(%.5g)=%.3g, A(%.5g)=%.3g\n',r0,1-A(a),r1,A(b))  % check decay
+[z w] = lgwt(500,a,b);
+%[z, A(z), Ap(z)], figure; plot(z,[A(z),Ap(z)],'+-'); return
+fprintf('G-L A'' FTC test: %.3g\n',sum(Ap(z).*w) + A(a)-A(b))
+
 % test values out...
 r = linspace(0,r1,1e4);
 [Ar,~,~,Apr] = eval_sister_apod(filehead,r);
-fprintf('crude A'' FTC test: %.3g\n',sum(Apr*(r(2)-r(1)))+A(r0+eps)-A(r1-eps))
+fprintf('crude A'' FTC test: %.3g\n',sum(Apr*(r(2)-r(1)))+A(a)-A(b))
+% (since A'~0 at ends, just expect O(h^2) err due to A'' in BV class.)
 
-figure; plot(r,[A(r);Ar;Ap(r);Apr],'-');  % compare
+figure; plot(r,[A(r);Ar;Ap(r);Apr],'-'); axis tight;       % compare
 hold on; o = load(filehead); plot(o.r,o.Profile,'r.');     % original data
 legend('A(r)','A vals','A''(r)','A'' vals','data');
 title('eval\_sister\_apod NI2 test'); xlabel('r (meters)'); vline([r0 r1]);

@@ -1,7 +1,7 @@
-function u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta)
+function u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta, shadfix)
 % NSLI_PTS  Fresnel aperture diffr via non-singular line-integral, arb targets
 %
-% u = nsli_pts(bx, by, wx, wy, lambdaz, xi, eta)
+% u = nsli_pts(bx, by, wx, wy, lambdaz, xi, eta, shadfix)
 %  returns list of complex amplitude values u at (xi,eta) target points a const
 %  distance z downstream, for an aperture for which nodes (bx,by) and vector
 %  weights (wx,wy) are a good quadrature scheme for vector line integrals over
@@ -17,6 +17,9 @@ function u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta)
 %             aperture radius in meters.
 %  xi, eta  - (real vectors, length M) x,y coords of target points in detector
 %             plane.
+%  shadfix -  (optional) if true, use heuristic quantization of u_{geom} to
+%             0 or 1 when target sufficiently far from shadow edge.
+%             Default: false.
 %
 % Outputs:
 %  u        - complex scalar diffracted amplitude at each target point
@@ -52,25 +55,54 @@ function u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta)
 %  quadrature weights are requested, not merely the nodes, allowing high-order
 %  accuracy. It is robust for targets arbitrarily near the aperture boundary,
 %  obviates any tests for targets being in geometric shadow, yet has very
-%  similar speed, and is also a much simpler code.
+%  similar speed, and is also a much simpler code. However, for a bad
+%  quadrature BDWF can reach better deep shadow accuracies (see 4).
 %
-% Also see: NSLI_EMULATES_BDWF
+% 4) shadfix: this can be ignored for the basic NSLI. However, for deep shadow
+%  simulations using poor boundary quadratures, shadfix=1 can match the
+%  otherwise superior performance of BDWF (which has u_{geom}=0 or 1 exactly, so
+%  in deep shadow where u_{geom}=0 can retain high *relative* accuracy, beating
+%  the high absolute accuracy of plain NSLI).
+%
+% Also see: BDWF_PTS, NSLI_EMULATES_BDWF
 
-% Barnett 9/13/20
+% Barnett 9/13/20. bdwf boost & u_geom quant hack 9/29/20.
 if nargin==0, test_nsli_pts; return; end
+if nargin<8, shadfix = 0; end             % default
 
-u = complex(nan*xi);                    % alloc complex outputs, shape of xi
-for i=1:numel(xi)
-  dx = bx - xi(i); dy = by - eta(i);    % displacements of nodes from ith targ
-  r2 = dx.*dx + dy.*dy;
-  f = (1-exp((1i*pi/lambdaz)*r2))./r2;  % unstable r2->0, but u st (barycentric)
-  f(r2==0.0) = 0.0;                     % kill NaNs (targ = some node)
-  u(i) = (1/2/pi) * sum((dx.*wy - dy.*wx) .* f);
+if ~shadfix                               % the plain 5-line NSLI method:
+  u = complex(nan*xi);                    % alloc complex outputs, shape of xi
+  for i=1:numel(xi)                       % loop over targets
+    dx = bx - xi(i); dy = by - eta(i);    % displacements of nodes from ith targ
+    r2 = dx.*dx + dy.*dy;
+    f = (1-exp((1i*pi/lambdaz)*r2))./r2;  % not stable for r2->0, but u is
+    f(r2==0.0) = 0.0;                     % kill NaNs (targ = some node)
+    u(i) = (1/2/pi) * sum((dx.*wy - dy.*wx) .* f);
+  end
+  
+else                                      % NSLI + deep-shadow rel acc of BDWF:
+  u = complex(nan*xi);                    % alloc complex outputs, shape of xi
+  for i=1:numel(xi)                       % loop over targets
+    dx = bx - xi(i); dy = by - eta(i);    % displacements of nodes from ith targ
+    r2 = dx.*dx + dy.*dy;  
+    if sum(r2<0.1*lambdaz)==0             % target "Fresnel-far" from bdry
+      crossir2 = (dx.*wy - dy.*wx)./r2;
+      inout = (1/2/pi) * sum(crossir2);   % since far, if quadr ok: ~0 out ~1 in
+      ugeom = (inout>0.5);                % quantize (as prev codes would)
+      u(i) = ugeom - (1/2/pi) * sum(crossir2 .* exp((1i*pi/lambdaz)*r2));   % LI
+    else                                  % can't be "deep" -> use non-singular
+      f = (1-exp((1i*pi/lambdaz)*r2))./r2;     % (as above)
+      f(r2==0.0) = 0.0;
+      u(i) = (1/2/pi) * sum((dx.*wy - dy.*wx) .* f);
+    end
+  end
+  
 end
+
 
 %%%%%%%%%%%%
 function test_nsli_pts
-verb = 0;
+verb = 0; shadfix = 0;   % case to test
 x = @(t) 0.5*cos(t)+0.5*cos(2*t); y = @(t) sin(t);        % smooth kite shape
 fresnum = 20.0;        % Fresnel number (if char radius were R=1)
 lambdaz=1/fresnum;     % wavelength times dist, recall Fres # = R^2/(lambda.z)
@@ -84,7 +116,7 @@ xi = 0.3; eta = -0.5;   % math test, one target, inside...
 kirchfac = 1/(1i*lambdaz);   % Kirchhoff prefactor for direct Fresnel integral
 [xq yq wq] = curveareaquad(bx,by,wx,wy,m);       % areal quadrature
 ud = kirchfac * sum(exp((1i*pi/lambdaz)*((xq-xi).^2+(yq-eta).^2)) .* wq);
-u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta);     % do it, w/ same bdry LI quadr
+u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta, shadfix);     % do it, w/ same bdry LI quadr
 fprintf('NSLI (n=%d) 1-targ err, vs direct Fresnel quadr: %.3g\n',n,abs(u-ud));
 
 j=400; d = [0 logspace(-17,-1,17)];  % check close targ dists from a node...
@@ -92,7 +124,7 @@ xi = bx(j) + 0*d; eta = by(j)-d;  ud = complex(nan*xi);
 for i=1:numel(xi)
   ud(i) = kirchfac*sum(exp((1i*pi/lambdaz)*((xq-xi(i)).^2+(yq-eta(i)).^2)).*wq);
 end
-u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta);
+u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta, shadfix);
 disp('target distance from a node, resulting errors (vs areal method):')
 disp([d(:) abs(u(:)-ud(:))])
 if verb, figure; plot(bx,by,'.'); hold on; plot(xi,eta,'r*'); axis equal tight;
@@ -105,7 +137,7 @@ wx = (2*pi/n)*bxp; wy = (2*pi/n)*byp;            % LI vector quadr wei
 ximax = 1.0; ngrid = 1e2; g = ximax*(2*(0:ngrid-1)/ngrid - 1);   % targets
 [xi eta] = ndgrid(g,g); M = numel(xi);
 t0=tic;
-u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta);     % do it
+u = nsli_pts(bx,by,wx,wy, lambdaz, xi, eta, shadfix);     % do it
 %u(ngrid/2+1,ngrid/2+1)       % use to check n-conv at the higher F #
 t0=toc(t0);
 fprintf('NSLI one lambda (n=%d, nTargs=%d) in %.3g s = %.3g targ-bdry pairs/s\n',n,M,t0,M*n/t0)
