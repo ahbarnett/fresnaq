@@ -8,13 +8,14 @@ The simulation of the optics
 of [starshades](http://sister.caltech.edu/) for exoplanet imaging
 is one application.
 
-<img align="right" src="pics/kite_grid.png">
-
 *Here is an example. The intensity due to diffraction from a smooth kite-shaped occulter at Fresnel number around 20 is evaluated at one million points, to 9-digit accuracy, in 0.05 sec on a laptop. All fringes are correct and not numerical or sampling artifacts. The occulter boundary is shown in white:*
 
-What is being accurately approximated here is the 2D Fresnel integral of the form:
+<img align="right" src="pics/kite_grid.png">
 
-<img align="center" src="pics/math_fres.png">
+What is being computed here is the 2D Fresnel integral of the form:
+
+<img align="left" src="pics/math_fres.png">
+<img align="right" src="pics/geom.png">
 
 in the case of a planar aperture &Omega;,
 or one minus this in the case of an occulter.
@@ -50,6 +51,7 @@ Since areal quadratures are key, there are various
 quadrature helper routines in ``util`` used in the tests and demos.
 One starshade description file is shipped in ``occulters``, along with
 some preliminary shadow results as PNGs.
+A movie sweeping wavelength is [here](https://users.flatironinstitute.org/~ahb/images/fres_sweep.mp4), which took only 30 s to compute.
 
 # example application to SISTER PSF basis
 
@@ -76,4 +78,6 @@ when fed an appropriate boundary quadrature. NSLI contains only around eight lin
 
 Please see our preprint here, and cite this if you use this software:
 
-  * Efficient high-order accurate Fresnel diffraction via areal quadrature and the nonuniform FFT, Alex H. Barnett, 2020. `arxiv<https://arxiv.org/abs/2010.05978>`_.
+  * Efficient high-order accurate Fresnel diffraction via areal quadrature and the nonuniform FFT, Alex H. Barnett, 2020. [arxiv](https://arxiv.org/abs/2010.05978)
+
+The codes used to generate all figures and tables in this paper is in the ``paper/fig_gen_codes`` directory.
