@@ -4,7 +4,7 @@
 clear; verb = 1;
 
 % targets: polar grid (rho,phi) in Vanderbei notation; radii (m) and angles...
-Nr=80; rho = linspace(0,4,Nr); Np = 1e2; phi = 2*pi*(1:Np)/Np;
+Nr=80; rho = linspace(0,4,Nr); Na = 1e2; phi = 2*pi*(1:Na)/Na;
 [rr pp] = ndgrid(rho,phi); xi = rr.*cos(pp); eta = rr.*sin(pp);  % (xi,eta)'s
 
 cwd = fileparts(mfilename('fullpath'));
@@ -53,7 +53,7 @@ fprintf('\tapod: rel gap wid 1-A(%.5g)=%.3g, rel tip wid A(%.5g)=%.3g\n',r0,1-Af
 
 % wavelength range to explore...
 Nl = 30; lambda = logspace(log10(lambdaint(1)*0.7),log10(lambdaint(2)*1.4),Nl);
-tol = 1e-6;
+tol = 1e-8;
 tic; maxu2 = nan(Nr,Nl);   % alloc output, and do the calc...
 for l=1:Nl
   u = fresnaq_pts(xq,yq,wq, lambda(l)*Z, xi,eta, tol);
