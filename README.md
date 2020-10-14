@@ -15,7 +15,7 @@ is one application.
 What is being computed here is the 2D Fresnel integral of the form:
 
 <img align="left" src="pics/math_fres.png">
-<img align="right" src="pics/geom.png">
+<img align="right" src="pics/geom.png" width=400>
 
 in the case of a planar aperture &Omega;,
 or one minus this in the case of an occulter.
