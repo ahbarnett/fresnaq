@@ -12,16 +12,18 @@ is one application.
 
 *Here is an example. The intensity due to diffraction from a smooth kite-shaped occulter at Fresnel number around 20 is evaluated at one million points, to 9-digit accuracy, in 0.05 sec on a laptop. All fringes are correct and not numerical or sampling artifacts. The occulter boundary is shown in white:*
 
-What is being computed here is the 2D Fresnel integral of the form:
+What is being computed by this package is the 2D Fresnel diffraction integral of the form:
 
-<img align="center" src="pics/math_fres.png">
-
-<img align="center" src="pics/geom.png" width=400>
+<p float="left">
+<img src="pics/math_fres.png" />
+<img src="pics/geom.png" width=300 />
+</p>
 
 in the case of a planar aperture &Omega;,
 or one minus this in the case of an occulter.
-This is done rapidly at a large numbers of target points
-(&eta;,&xi;),
+Here _z_ is the propagation distance and &lambda; the wavelength.
+The package does this rapidly at a large numbers of target points (&eta;,&xi;),
+either on a grid, or arbitrary,
 given an accurate areal quadrature for the domain &Omega;.
 
 # requirements
