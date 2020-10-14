@@ -8,14 +8,15 @@ The simulation of the optics
 of [starshades](http://sister.caltech.edu/) for exoplanet imaging
 is one application.
 
-*Here is an example. The intensity due to diffraction from a smooth kite-shaped occulter at Fresnel number around 20 is evaluated at one million points, to 9-digit accuracy, in 0.05 sec on a laptop. All fringes are correct and not numerical or sampling artifacts. The occulter boundary is shown in white:*
+<img align="right" src="pics/kite_grid.png" width=400>
 
-<img align="right" src="pics/kite_grid.png">
+*Here is an example. The intensity due to diffraction from a smooth kite-shaped occulter at Fresnel number around 20 is evaluated at one million points, to 9-digit accuracy, in 0.05 sec on a laptop. All fringes are correct and not numerical or sampling artifacts. The occulter boundary is shown in white:*
 
 What is being computed here is the 2D Fresnel integral of the form:
 
-<img align="left" src="pics/math_fres.png">
-<img align="right" src="pics/geom.png" width=400>
+<img align="center" src="pics/math_fres.png">
+
+<img align="center" src="pics/geom.png" width=400>
 
 in the case of a planar aperture &Omega;,
 or one minus this in the case of an occulter.
