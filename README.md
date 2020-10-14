@@ -10,21 +10,22 @@ is one application.
 
 <img align="right" src="pics/kite_grid.png" width=400>
 
-*Here is an example. The intensity due to diffraction from a smooth kite-shaped occulter at Fresnel number around 20 is evaluated at one million points, to 9-digit accuracy, in 0.05 sec on a laptop. All fringes are correct and not numerical or sampling artifacts. The occulter boundary is shown in white:*
+*Here is an example. The intensity due to diffraction from a smooth kite-shaped occulter at Fresnel number around 20 is evaluated at one million targets, to 9-digit accuracy, in 0.05 s on a laptop. All fringes are correct and not numerical or sampling artifacts. The occulter boundary is shown in white:*
 
-What is being computed by this package is the 2D Fresnel diffraction integral of the form:
+This package computes 2D Fresnel diffraction integrals of the form:
 
 <p float="left">
 <img src="pics/math_fres.png" />
-<img src="pics/geom.png" width=300 />
+<img src="pics/geom.png" width=350 />
 </p>
 
 in the case of a planar aperture &Omega;,
 or one minus this in the case of an occulter.
 Here _z_ is the propagation distance and &lambda; the wavelength.
-The package does this rapidly at a large numbers of target points (&eta;,&xi;),
+The package does this rapidly at a large numbers of target points (&xi;,&eta;),
 either on a grid, or arbitrary,
-given an accurate areal quadrature for the domain &Omega;.
+given an accurate areal quadrature for the domain &Omega;. See our
+preprint listed at the bottom.
 
 # requirements
 
