@@ -1,16 +1,26 @@
 # fresnaq
 
 **FRESN**el **A**real **Q**uadrature:
-Fast non-uniform Fourier
+Fast nonuniform Fourier
 method for computation of scalar Fresnel diffraction from
 binary (hard-edged) apertures and occulters, in MATLAB/Octave.
 The simulation of the optics
 of [starshades](http://sister.caltech.edu/) for exoplanet imaging
 is one application.
 
+<img align="right" src="pics/kite_grid.png">
+
 *Here is an example. The intensity due to diffraction from a smooth kite-shaped occulter at Fresnel number around 20 is evaluated at one million points, to 9-digit accuracy, in 0.05 sec on a laptop. All fringes are correct and not numerical or sampling artifacts. The occulter boundary is shown in white:*
 
-![fresnaq demo image](pics/kite_grid.png "kite occulter example")
+What is being accurately approximated here is the 2D Fresnel integral of the form:
+
+<img align="center" src="pics/math_fres.png">
+
+in the case of a planar aperture &Omega;,
+or one minus this in the case of an occulter.
+This is done rapidly at a large numbers of target points
+(&eta;,&xi;),
+given an accurate areal quadrature for the domain &Omega;.
 
 # requirements
 
@@ -61,3 +71,9 @@ which also can achieve high-order accuracy (unlike BDWF which is 2nd-order),
 when fed an appropriate boundary quadrature. NSLI contains only around eight lines of code (but much more in the form of documentation and testing).
 
 **Note**: The term "boundary integral" refers to a line integral over the aperture/occulter boundary, and should not be confused with 3D integral-equation based wave scattering methods (which would go beyond the Fresnel approximation, and are significantly more time consuming and harder to code).
+
+# details and citation
+
+Please see our preprint here, and cite this if you use this software:
+
+  * Efficient high-order accurate Fresnel diffraction via areal quadrature and the nonuniform FFT, Alex H. Barnett, 2020. `arxiv<https://arxiv.org/abs/2010.05978>`_.
