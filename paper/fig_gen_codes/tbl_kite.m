@@ -1,9 +1,9 @@
 % timings and acc table for param smooth curves (kite). Barnett 9/21/20
 addpath ~/numerics/finufft/matlab
-addpath ../../fresnaq
+addpath ../../
 startup
 
-if 0 %%%%%%%%%%
+if 1 %%%%%%%%%%
 clear
 x = @(t) 0.5*cos(t)+0.5*cos(2*t); y = @(t) sin(t);   % param, C^infty smooth
 tols = [1e-6 1e-12];                % fresnaq to test
@@ -48,7 +48,7 @@ end
 % diagnosing bdwf max errors associated with near geom shadow...
 %figure; scatter(xi,eta,10,log10(abs(u0ocprop(:)-ub(:)))); colormap
 
-end %%%%%%%%%%
+else %%%%%%%%%%
 
 
 % ----------------------- final high-fresnel # example
@@ -79,3 +79,5 @@ t = tic;
 ug = fresnaq_grid(xq, yq, wq, lambdaz, ximax, ngrid, tol, verb);
 err = abs(u0-ug(itest));
 fprintf('faq_grid (%g):\tmederr %.2g, maxerr %.2g\ttime %.3g s\n',tol,median(err),max(err),toc(t))
+
+end %%%%%%%%%%%

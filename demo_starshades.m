@@ -48,7 +48,9 @@ switch design
 end
 fprintf('apod ends: 1-A(%.5g)=%.3g, A(%.5g)=%.3g\n',r0,1-Afunc(r0),r1,Afunc(r1))
 
+tic
 [xq yq wq bx by] = starshadequad(Np,Afunc,r0,r1,n,m,verb);   % fill areal quadr
+fprintf('starshade quad gen time: %.3g s\n',toc)
 
 if verb>1, figure(1); clf; scatter(xq,yq,10,wq); axis equal tight; colorbar;
   hold on; plot([bx;bx(1)], [by;by(1)], 'k-'); title('starshade quadr');
