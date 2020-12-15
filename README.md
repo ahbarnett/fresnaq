@@ -56,6 +56,8 @@ quadrature helper routines in ``util`` used in the tests and demos.
 One starshade description file is shipped in ``occulters``, along with
 some preliminary shadow results as PNGs.
 A movie sweeping wavelength is [here](https://users.flatironinstitute.org/~ahb/images/fres_sweep.mp4), which took only 30 s to compute.
+A notch-like perturbation to an ideal starshade is handled and demo'ed by
+``utils/starshadenotch.m``.
 
 # example application to SISTER PSF basis
 

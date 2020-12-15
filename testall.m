@@ -1,6 +1,6 @@
 % run all component tests in FRESNAQ.
 % Makes lots of figures, text accuracy outputs, takes around 30 secs total.
-% Barnett 9/16/20
+% Barnett 12/15/20
 
 startup  % in case
 
@@ -22,6 +22,7 @@ perispecdiff
 endcorrquad
 test_Alpert_quad
 globalinterp1d
+starshadenotch
 
 % bdrymeths
 crudecurvequad
