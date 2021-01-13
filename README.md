@@ -82,8 +82,9 @@ when fed an appropriate boundary quadrature. NSLI contains only around eight lin
 
 # details and citation
 
-Please see our preprint here, and cite this if you use this software:
+Please see our paper here, and cite this if you use this software:
 
-  * Efficient high-order accurate Fresnel diffraction via areal quadrature and the nonuniform FFT, Alex H. Barnett, 2020. [arxiv](https://arxiv.org/abs/2010.05978)
+  * Efficient high-order accurate Fresnel diffraction via areal quadrature and the nonuniform FFT, Alex H. Barnett, J. Astron. Telesc. Instrum. Syst.
+7(2), 021211 (2021).  [arxiv](https://arxiv.org/abs/2010.05978), [published](https://doi.org/10.1117/1.JATIS.7.2.021211)
 
 The codes used to generate all figures and tables in this paper is in the ``paper/fig_gen_codes`` directory.
